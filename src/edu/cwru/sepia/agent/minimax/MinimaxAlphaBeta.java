@@ -74,6 +74,13 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
     {
+
+        return node;
+    }
+    
+    public int alphabeta(GameStateChild node, int depth, int alpha, int beta, boolean maximizingPlayer)
+    {
+    	int v = 0;
     	//pseudo code
     	//if depth = 0 or node is terminal
     		//return heuristic value of node
@@ -93,7 +100,7 @@ public class MinimaxAlphaBeta extends Agent {
     			//if beta <= alpha
     				//break (*a cut off *)
     			//return v
-        return node;
+    	return v;
     }
 
     /**
