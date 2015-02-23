@@ -74,7 +74,16 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
     {
-
+    	int maxval = -999999999;
+    	
+    	//for each other child
+    		//childval = alphabeta(child, depth, alpha, beta, true);
+    		//if (childval > maxval)
+    		//{
+    			//maxval = childval;
+    			//choiceNode = child;
+    		//}
+    	
         return node;
     }
     
