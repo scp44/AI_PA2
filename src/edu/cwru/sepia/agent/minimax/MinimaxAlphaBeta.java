@@ -74,6 +74,25 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
     {
+    	//pseudo code
+    	//if depth = 0 or node is terminal
+    		//return heuristic value of node
+    	//if maximizingPlayer
+    		//v = -infinity
+    		//for each child of node
+    			//v = max (v, alphaBetaSearch(child, depth - 1, alpha, beta, FALSE))
+    			//alpha = max (alpha, v)
+    			//if (beta < = alpha)
+    				//break (* beta cut-off *)
+    			//return v
+    	//else
+    		//v = infinity
+    		//for each child of node
+    			//v = min (v, alphaBetaSearch(child, depth - 1, alpha, beta, TRUE))
+    			//beta = min(beta, v)
+    			//if beta <= alpha
+    				//break (*a cut off *)
+    			//return v
         return node;
     }
 
