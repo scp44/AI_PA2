@@ -85,4 +85,11 @@ public class GameState {
     public List<GameStateChild> getChildren() {
         return null;
     }
+    
+    public int getDistance(Unit.UnitView unit1, Unit.UnitView unit2)
+    {
+    	int distance = 0;
+    	distance = ((unit2.getXPosition()-unit1.getXPosition())^2 + (unit2.getYPosition()-unit1.getYPosition())^2)^(1/2);
+    	return distance;
+    }
 }
