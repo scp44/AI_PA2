@@ -86,6 +86,16 @@ public class GameState {
         return null;
     }
     
+    public double getXExtent()
+    {	
+    	return 0;
+    }
+    
+    public double getYExtent()
+    {	
+    	return 0;
+    }
+    
     public int getDistance(Unit.UnitView unit1, Unit.UnitView unit2)
     {
     	int distance = 0;
