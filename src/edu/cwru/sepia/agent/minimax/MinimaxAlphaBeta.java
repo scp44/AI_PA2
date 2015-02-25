@@ -78,9 +78,10 @@ public class MinimaxAlphaBeta extends Agent {
     {
     	int maxval = -infinity;
     	int childval;
+    	
     	List<GameStateChild> children = new ArrayList<GameStateChild>();
-    	//List<GameStateChild> children = orderChildrenWithHeuristics(node's children...?);
-
+    	children = node.state.getChildren();
+    	children = orderChildrenWithHeuristics(children);
     	for(int i = 0; i < children.size(); i++)
     	{
     		childval = alphabeta(children.get(i), depth, alpha, beta, true);
@@ -96,11 +97,12 @@ public class MinimaxAlphaBeta extends Agent {
     public int alphabeta(GameStateChild node, int depth, double alpha, double beta, boolean maximizingPlayer)
     {
     	int v = 0;
-    	List<GameStateChild> children = new ArrayList<GameStateChild>();;
-    	//List<GameStateChild> children = orderChildrenWithHeuristics(node's children...?);
+    	List<GameStateChild> children = new ArrayList<GameStateChild>();
+    	children = node.state.getChildren();
+    	children = orderChildrenWithHeuristics(children);
     	if(depth == 0 || children.size() == 0)
     	{
-    		//return heuristic value of node
+    		node.state.getUtility();
     	}
     	if (maximizingPlayer)
     	{
@@ -143,6 +145,24 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public List<GameStateChild> orderChildrenWithHeuristics(List<GameStateChild> children)
     {
+    	children = insertionSort(children);
         return children;
+    }
+    
+    public List<GameStateChild> insertionSort(List<GameStateChild> list)
+    {
+    	GameStateChild temp;
+    	for(int i = 1; i < list.size(); i++)
+    	{
+    		temp = list.get(i);
+    		int j;
+    		for (j = i-1; j >= 0 && temp.state.getUtility() < list.get(j).state.getUtility(); j++)
+    		{
+    			list.remove(j+i);
+    			list.add(j+1, list.get(j));
+    		}
+    		list.add(j+1, temp);
+    	}
+    	return list;
     }
 }
