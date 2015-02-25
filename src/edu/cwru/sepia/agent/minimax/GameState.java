@@ -4,11 +4,13 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
 import edu.cwru.sepia.util.Direction;
 
 import java.util.*;
+
 
 /**
  * This class stores all of the information the agent
@@ -20,11 +22,27 @@ import java.util.*;
  */
 public class GameState {
 
+	class MapLocation
+    {
+        public int x, y;
+
+
+        public MapLocation(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
 	
-	private List<Integer> friendlyUnitIDs;
-	private List<Integer> enemyUnitIDs;
+	
+	
+	private List<Integer> friendlyUnitIDs = new ArrayList<Integer>();
+	private List<Integer> enemyUnitIDs = new ArrayList<Integer>();
 	private Unit.UnitView[] friendlyArr;
 	private Unit.UnitView[] enemyArr;
+	private HashSet<MapLocation> resourceLocations = new HashSet<MapLocation>();
+	private int mapXExtent;
+	private int mapYExtent;
     /**
      * You will implement this constructor. It will
      * extract all of the needed state information from the built in
@@ -61,6 +79,17 @@ public class GameState {
         {
             friendlyArr[index] = state.getUnit(unitID);
         }
+
+    	List<Integer> resourceIDs = state.getAllResourceIds();
+        
+        for(Integer resourceID : resourceIDs)
+        {
+            ResourceNode.ResourceView resource = state.getResourceNode(resourceID);
+            resourceLocations.add(new MapLocation(resource.getXPosition(), resource.getYPosition()));
+        }
+        
+        mapXExtent = state.getXExtent();
+        mapYExtent = state.getYExtent();
     }
 
     /**
@@ -111,6 +140,16 @@ public class GameState {
      * @return All possible actions and their associated resulting game state
      */
     public List<GameStateChild> getChildren() {
+    	List<GameStateChild> childNodes = new ArrayList<GameStateChild>();
+    	for (Integer i : friendlyUnitIDs) {
+    		Action myAct = Action.createCompoundMove(i, friendlyArr[i].getXPosition() + 1, 
+    				friendlyArr[i].getXPosition());
+    		//Action myAction = new Action(i, ActionType.PRIMITIVEMOVE);
+    	}
+    	
+    	//GameStateChild child = new GameStateChild()
+
+    	
         return null;
     }
     
