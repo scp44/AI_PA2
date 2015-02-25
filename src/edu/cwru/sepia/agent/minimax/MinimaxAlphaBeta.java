@@ -13,6 +13,7 @@ import java.util.Map;
 public class MinimaxAlphaBeta extends Agent {
 
     private final int numPlys;
+    private static int infinity = 999999999;
 
     public MinimaxAlphaBeta(int playernum, String[] args)
     {
@@ -74,41 +75,53 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
     {
-    	int maxval = -999999999;
-    	
-    	//for each other child
-    		//childval = alphabeta(child, depth, alpha, beta, true);
-    		//if (childval > maxval)
-    		//{
-    			//maxval = childval;
-    			//choiceNode = child;
-    		//}
-    	
+    	int maxval = -infinity;
+    	int childval;
+    	List<GameStateChild> children;
+    	//List<GameStateChild> children = orderChildrenWithHeuristics(node's children...?);
+
+    	for(int i = 0; i < children.size(); i++)
+    	{
+    		childval = alphabeta(children.get(i), depth, alpha, beta, true);
+    		if (childval > maxval)
+    		{
+    			maxval = childval;
+    			node = children.get(i);
+    		}
+    	}
         return node;
     }
     
-    public int alphabeta(GameStateChild node, int depth, int alpha, int beta, boolean maximizingPlayer)
+    public int alphabeta(GameStateChild node, int depth, double alpha, double beta, boolean maximizingPlayer)
     {
     	int v = 0;
-    	//pseudo code
-    	//if depth = 0 or node is terminal
+    	if(depth == 0 /*node is terminal*/)
+    	{
+    		
     		//return heuristic value of node
-    	//if maximizingPlayer
-    		//v = -infinity
+    	}
+    	if (maximizingPlayer)
+    	{
+    		v = -infinity;
     		//for each child of node {
-    			//v = max (v, alphaBetaSearch(child, depth - 1, alpha, beta, FALSE))
-    			//alpha = max (alpha, v)
+    			//v = max (v, alphabeta(child, depth - 1, alpha, beta, FALSE))
+    			alpha = Math.max(alpha, v);
     			//if (beta <= alpha)
     				//break
     		//}
+    	}
+    		
     	//else
-    		//v = infinity
+    	else
+    	{
+    		v = infinity;
     		//for each child of node {
     			//v = min (v, alphaBetaSearch(child, depth - 1, alpha, beta, TRUE))
-    			//beta = min(beta, v)
+    			beta = Math.min(beta, v);
     			//if beta <= alpha
     				//break
     		//}
+    	}
     	return v;
     }
 
