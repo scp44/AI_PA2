@@ -8,6 +8,7 @@ import edu.cwru.sepia.environment.model.state.State;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class MinimaxAlphaBeta extends Agent {
@@ -77,7 +78,7 @@ public class MinimaxAlphaBeta extends Agent {
     {
     	int maxval = -infinity;
     	int childval;
-    	List<GameStateChild> children;
+    	List<GameStateChild> children = new ArrayList<GameStateChild>();
     	//List<GameStateChild> children = orderChildrenWithHeuristics(node's children...?);
 
     	for(int i = 0; i < children.size(); i++)
@@ -95,32 +96,34 @@ public class MinimaxAlphaBeta extends Agent {
     public int alphabeta(GameStateChild node, int depth, double alpha, double beta, boolean maximizingPlayer)
     {
     	int v = 0;
-    	if(depth == 0 /*node is terminal*/)
+    	List<GameStateChild> children = new ArrayList<GameStateChild>();;
+    	//List<GameStateChild> children = orderChildrenWithHeuristics(node's children...?);
+    	if(depth == 0 || children.size() == 0)
     	{
-    		
     		//return heuristic value of node
     	}
     	if (maximizingPlayer)
     	{
     		v = -infinity;
-    		//for each child of node {
-    			//v = max (v, alphabeta(child, depth - 1, alpha, beta, FALSE))
+        	for(int i = 0; i < children.size(); i++)
+        	{
+    			v = Math.max(v, alphabeta(children.get(i), depth - 1, alpha, beta, false));
     			alpha = Math.max(alpha, v);
-    			//if (beta <= alpha)
-    				//break
-    		//}
+    			if (beta <= alpha)
+    				break;
+    		}
     	}
     		
-    	//else
     	else
     	{
     		v = infinity;
-    		//for each child of node {
-    			//v = min (v, alphaBetaSearch(child, depth - 1, alpha, beta, TRUE))
+        	for(int i = 0; i < children.size(); i++)
+        	{
+    			v = Math.min(v, alphabeta(children.get(i), depth - 1, alpha, beta, true));
     			beta = Math.min(beta, v);
-    			//if beta <= alpha
-    				//break
-    		//}
+    			if (beta <= alpha)
+    				break;
+    		}
     	}
     	return v;
     }
