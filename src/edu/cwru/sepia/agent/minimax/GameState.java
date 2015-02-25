@@ -20,6 +20,11 @@ import java.util.*;
  */
 public class GameState {
 
+	
+	private List<Integer> friendlyUnitIDs;
+	private List<Integer> enemyUnitIDs;
+	private Unit.UnitView[] friendlyArr;
+	private Unit.UnitView[] enemyArr;
     /**
      * You will implement this constructor. It will
      * extract all of the needed state information from the built in
@@ -42,6 +47,20 @@ public class GameState {
      * @param state Current state of the episode
      */
     public GameState(State.StateView state) {
+    	friendlyUnitIDs = state.getUnitIds(0);
+    	enemyUnitIDs = state.getUnitIds(1);
+    	friendlyArr = new Unit.UnitView[friendlyUnitIDs.size()];
+    	enemyArr = new Unit.UnitView[enemyUnitIDs.size()];
+    	int index = 0;
+    	for(Integer unitID : enemyUnitIDs)
+        {
+            enemyArr[index] = state.getUnit(unitID);
+        }
+    	index = 0;
+    	for(Integer unitID : friendlyUnitIDs)
+        {
+            friendlyArr[index] = state.getUnit(unitID);
+        }
     }
 
     /**
@@ -63,7 +82,16 @@ public class GameState {
      * @return The weighted linear combination of the features
      */
     public double getUtility() {
-        return 0.0;
+    	int tempMin = Integer.MAX_VALUE;
+    	int runningCount = 0;
+    	for (int i = 0; i < friendlyArr.length; i++) {
+    		for (int j = 0; j < enemyArr.length; j++) {
+    			tempMin = tempMin > getDistance(friendlyArr[i], enemyArr[j]) ? 
+    					getDistance(friendlyArr[i], enemyArr[j]) : tempMin;
+    		}
+    		runningCount += tempMin;
+    	}
+        return (double) 1.0 / runningCount;
     }
 
     /**
