@@ -86,7 +86,7 @@ public class MinimaxAlphaBeta extends Agent {
     	children = orderChildrenWithHeuristics(children);
     	for(int i = 0; i < children.size(); i++)
     	{
-    		childval = alphabeta(children.get(i), depth, alpha, beta, true);
+    		childval = alphabeta(children.get(i), depth-1, alpha, beta, false);
     		if (childval > maxval)
     		{
     			maxval = childval;
