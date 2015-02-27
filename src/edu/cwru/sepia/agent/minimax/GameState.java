@@ -24,7 +24,43 @@ public class GameState {
 
 	class MapLocation
     {
-        public int x, y;
+        @Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + x;
+			result = prime * result + y;
+			return result;
+		}
+
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (!(obj instanceof MapLocation)) {
+				return false;
+			}
+			MapLocation other = (MapLocation) obj;
+			if (!getOuterType().equals(other.getOuterType())) {
+				return false;
+			}
+			if (x != other.x) {
+				return false;
+			}
+			if (y != other.y) {
+				return false;
+			}
+			return true;
+		}
+
+
+		public int x, y;
 
 
         public MapLocation(int x, int y)
@@ -32,6 +68,11 @@ public class GameState {
             this.x = x;
             this.y = y;
         }
+
+
+		private GameState getOuterType() {
+			return GameState.this;
+		}
     }
 	
 	
@@ -65,29 +106,34 @@ public class GameState {
      * @param state Current state of the episode
      */
     public GameState(State.StateView state) {
+    	
+    	//Initialize the archers and footmen arrays here
     	friendlyUnitIDs = state.getUnitIds(0);
     	enemyUnitIDs = state.getUnitIds(1);
     	friendlyArr = new Unit.UnitView[friendlyUnitIDs.size()];
     	enemyArr = new Unit.UnitView[enemyUnitIDs.size()];
+    	//Fill in the enemyArr with enemy UnitView objects
     	int index = 0;
     	for(Integer unitID : enemyUnitIDs)
         {
-            enemyArr[index] = state.getUnit(unitID);
+            enemyArr[index++] = state.getUnit(unitID);
         }
+    	//Fill in the enemyArr with friendly UnitView objects
     	index = 0;
     	for(Integer unitID : friendlyUnitIDs)
         {
-            friendlyArr[index] = state.getUnit(unitID);
+            friendlyArr[index++] = state.getUnit(unitID);
         }
-
+    	//Get the resource IDs
     	List<Integer> resourceIDs = state.getAllResourceIds();
-        
+        //Store the resource locations into a HashSet (resourceLocations), which encapsulates each resource
+    	//as a MapLocation object (with only x and y coordinates)
         for(Integer resourceID : resourceIDs)
         {
             ResourceNode.ResourceView resource = state.getResourceNode(resourceID);
             resourceLocations.add(new MapLocation(resource.getXPosition(), resource.getYPosition()));
         }
-        
+        //Get the boundaries (size) of the entire map s
         mapXExtent = state.getXExtent();
         mapYExtent = state.getYExtent();
     }
@@ -113,6 +159,8 @@ public class GameState {
     public double getUtility() {
     	int tempMin = Integer.MAX_VALUE;
     	int runningCount = 0;
+    	//Calculate the minimum distance between pairs of archers/footment, and take the sum of
+    	//those minimum values
     	for (int i = 0; i < friendlyArr.length; i++) {
     		for (int j = 0; j < enemyArr.length; j++) {
     			tempMin = tempMin > getDistance(friendlyArr[i], enemyArr[j]) ? 
@@ -120,6 +168,8 @@ public class GameState {
     		}
     		runningCount += tempMin;
     	}
+    	//Return the utility of the state as the inverse of the sum of mins; ie: when archers and footmen 
+    	//are far apart, the utility is low, and vice versa
         return (double) 1.0 / runningCount;
     }
 
@@ -141,9 +191,35 @@ public class GameState {
      */
     public List<GameStateChild> getChildren() {
     	List<GameStateChild> childNodes = new ArrayList<GameStateChild>();
+    	Map<Integer, Action> unitActions = new HashMap<Integer, Action>();
     	for (Integer i : friendlyUnitIDs) {
-    		Action myAct = Action.createCompoundMove(i, friendlyArr[i].getXPosition() + 1, 
-    				friendlyArr[i].getXPosition());
+    		int footmenX = friendlyArr[i].getXPosition();
+    		int footmenY = friendlyArr[i].getYPosition();
+    		for(Direction direction : Direction.values()) {
+    			int dirX = direction.xComponent();
+    			int dirY = direction.yComponent();
+    			//A big conditional to check that the direction of the move is not colliding with an obstacle,
+    			//is not a diagonal move (not allowed), and is within the boundaries of the map
+    			if ((dirX == 0 || dirY == 0) && !resourceLocations.contains(new MapLocation(footmenX + dirX, 
+        				footmenY + dirY)) && footmenY + dirY >= 0 && footmenX + dirX >= 0 &&
+        				footmenY + dirY <= mapYExtent && footmenX + dirX <= mapXExtent) {
+    				
+    			}
+    		}
+    		//Check if the next move is blocked by an obstacle or is out of bounds
+    		if(!resourceLocations.contains(new MapLocation(footmenX + 1, 
+    				footmenY)) && footmenX + 1 <= mapXExtent) {
+    			//Create the action
+    			Action myAct = Action.createCompoundMove(i, footmenX + 1, 
+        				footmenY);
+    			unitActions.put(i, myAct);
+    			for (Integer j : enemyUnitIDs) {
+    				int archerX = enemyArr[i].getXPosition();
+    	    		int archerY = enemyArr[i].getYPosition();
+    			}
+    		}
+    		
+    		
     		//Action myAction = new Action(i, ActionType.PRIMITIVEMOVE);
     	}
     	
@@ -152,17 +228,7 @@ public class GameState {
     	
         return null;
     }
-    
-    public double getXExtent()
-    {	
-    	return 0;
-    }
-    
-    public double getYExtent()
-    {	
-    	return 0;
-    }
-    
+
     public int getDistance(Unit.UnitView unit1, Unit.UnitView unit2)
     {
     	int distance = 0;
