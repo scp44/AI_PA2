@@ -81,6 +81,8 @@ public class MinimaxAlphaBeta extends Agent {
     	
     	List<GameStateChild> children = new ArrayList<GameStateChild>();
     	children = node.state.getChildren();
+    	if(children == null)
+    		return node;
     	children = orderChildrenWithHeuristics(children);
     	for(int i = 0; i < children.size(); i++)
     	{
@@ -145,6 +147,9 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public List<GameStateChild> orderChildrenWithHeuristics(List<GameStateChild> children)
     {
+    	if(children.isEmpty())
+    		return children;
+    	
     	children = insertionSort(children);
         return children;
     }
