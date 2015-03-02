@@ -86,7 +86,7 @@ public class MinimaxAlphaBeta extends Agent {
     	children = orderChildrenWithHeuristics(children);
     	for(int i = 0; i < children.size(); i++)
     	{
-    		childval = alphabeta(children.get(i), depth-1, alpha, beta, false);
+    		childval = minimax(children.get(i), depth-1, alpha, beta, false);
     		if (childval > maxval)
     		{
     			maxval = childval;
@@ -96,7 +96,7 @@ public class MinimaxAlphaBeta extends Agent {
         return node;
     }
     
-    public int alphabeta(GameStateChild node, int depth, double alpha, double beta, boolean maximizingPlayer)
+    public int minimax(GameStateChild node, int depth, double alpha, double beta, boolean maximizingPlayer)
     {
     	int v = 0;
     	List<GameStateChild> children = new ArrayList<GameStateChild>();
@@ -111,7 +111,7 @@ public class MinimaxAlphaBeta extends Agent {
     		v = -infinity;
         	for(int i = 0; i < children.size(); i++)
         	{
-    			v = Math.max(v, alphabeta(children.get(i), depth - 1, alpha, beta, false));
+    			v = Math.max(v, minimax(children.get(i), depth - 1, alpha, beta, false));
     			alpha = Math.max(alpha, v);
     			if (beta <= alpha)
     				break;
@@ -123,7 +123,7 @@ public class MinimaxAlphaBeta extends Agent {
     		v = infinity;
         	for(int i = 0; i < children.size(); i++)
         	{
-    			v = Math.min(v, alphabeta(children.get(i), depth - 1, alpha, beta, true));
+    			v = Math.min(v, minimax(children.get(i), depth - 1, alpha, beta, true));
     			beta = Math.min(beta, v);
     			if (beta <= alpha)
     				break;
