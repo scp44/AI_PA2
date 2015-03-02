@@ -4,11 +4,14 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
+import edu.cwru.sepia.environment.model.state.PlayerState;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
+import edu.cwru.sepia.environment.model.state.StateCreator;
 import edu.cwru.sepia.environment.model.state.Unit;
 import edu.cwru.sepia.util.Direction;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -75,6 +78,8 @@ public class GameState {
 	private HashSet<MapLocation> resourceLocations = new HashSet<MapLocation>();
 	private int mapXExtent;
 	private int mapYExtent;
+	private State.StateView thisState;
+	private StateCreator creator;
 
 	/**
 	 * You will implement this constructor. It will extract all of the needed
@@ -116,7 +121,14 @@ public class GameState {
 		for (Integer unitID : friendlyUnitIDs) {
 			friendlyArr[index++] = state.getUnit(unitID);
 		}
-
+		/*for (int i = 0; i < 2; i++) {
+			System.out.println("A footmen unit at: (" + friendlyArr[i].getXPosition() + ", " 
+					+ friendlyArr[i].getYPosition() + ")");
+		}
+		for (int i = 0; i < 2; i++) {
+			System.out.println("A archer unit at: (" + enemyArr[i].getXPosition() + ", " 
+					+ enemyArr[i].getYPosition() + ")");
+		}*/
 		// Get the resource IDs
 		List<Integer> resourceIDs = state.getAllResourceIds();
 		// Store the resource locations into a HashSet (resourceLocations),
@@ -125,12 +137,20 @@ public class GameState {
 		for (Integer resourceID : resourceIDs) {
 			ResourceNode.ResourceView resource = state
 					.getResourceNode(resourceID);
+			//System.out.println("Resource location at: (" + resource.getXPosition() + ", " + 
+				//	resource.getYPosition() + ")");
 			resourceLocations.add(new MapLocation(resource.getXPosition(),
 					resource.getYPosition()));
 		}
 		// Get the boundaries (size) of the entire map s
 		mapXExtent = state.getXExtent();
 		mapYExtent = state.getYExtent();
+		try {
+			creator = state.getStateCreator();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -213,6 +233,7 @@ public class GameState {
 								&& footmen1Y + dirY >= 0 && footmen1X + dirX >= 0
 								&& footmen1Y + dirY <= mapYExtent
 								&& footmen1X + dirX <= mapXExtent) {
+					//Create the action for footmen1 to move towards direction
 					Action footAct = Action.createCompoundMove(firstFootmenID,
 							footmen1X + dirX, footmen1Y + dirY);
 
@@ -227,10 +248,34 @@ public class GameState {
 										&& footmen2Y + dir2Y >= 0 && footmen2X + dir2X >= 0
 										&& footmen2Y + dir2Y <= mapYExtent
 										&& footmen2X + dir2X <= mapXExtent) {
+							//Create the action for the second footmen to move towards direction2
 							Action footAct2 = Action.createCompoundMove(secondFootmenID,
 									footmen2X + dir2X, footmen2Y + dir2Y);
 							unitActions.put(firstFootmenID, footAct);
 							unitActions.put(secondFootmenID, footAct2);
+							State childState = creator.createState();
+							System.out.println("Footmen's initial position is: (" + 
+									childState.getUnit(firstFootmenID).getxPosition() + ", " + 
+									childState.getUnit(firstFootmenID).getyPosition() + ")");
+							childState.moveUnit(childState.getUnit(firstFootmenID), direction);
+							childState.moveUnit(childState.getUnit(secondFootmenID), direction2);
+							
+							GameState dummy = new GameState(childState.getView(0));
+							System.out.println("New state's 1st footmen location: (" + 
+									dummy.friendlyArr[0].getXPosition() + ", " + 
+									dummy.friendlyArr[0].getYPosition() + ")");
+							System.out.println("New state's 2nd footmen location: (" + 
+									dummy.friendlyArr[1].getXPosition() + ", " + 
+									dummy.friendlyArr[1].getYPosition() + ")");
+							childNodes.add(new GameStateChild(unitActions, new GameState(childState.getView(0))));
+							
+							/*unitActions.put(firstFootmenID, footAct);
+							unitActions.put(secondFootmenID, footAct2);
+							State builder = new State();
+							//footmenPlayer.addUnit();
+							builder.addPlayer(0);
+							builder.addPlayer(1);
+							Unit footmen1 = new Unit(null, 0);*/
 						}
 					}
 				}
