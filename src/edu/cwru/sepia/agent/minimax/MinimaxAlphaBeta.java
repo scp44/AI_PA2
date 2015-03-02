@@ -100,7 +100,7 @@ public class MinimaxAlphaBeta extends Agent {
     {
     	int v = 0;
     	List<GameStateChild> children = new ArrayList<GameStateChild>();
-    	children = node.state.getChildren(true);
+    	children = node.state.getChildren(maximizingPlayer);
     	children = orderChildrenWithHeuristics(children);
     	if(depth == 0 || children.size() == 0)
     	{
