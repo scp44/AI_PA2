@@ -24,7 +24,9 @@ public class MinimaxAlphaBeta extends Agent {
 			System.exit(1);
 		}
 
-		numPlys = Integer.parseInt(args[0]);
+		//numPlys = Integer.parseInt(args[0]);
+		numPlys = 1;
+		System.out.println("Number of plys is: " + numPlys);
 	}
 
 	@Override
@@ -84,12 +86,11 @@ public class MinimaxAlphaBeta extends Agent {
 			double alpha, double beta) {
 		double maxval = -infinity;
 		double childval;
-
 		List<GameStateChild> children = new ArrayList<GameStateChild>();
 		children = node.state.getChildren(true);
 		if (children == null)
 			return node;
-		children = orderChildrenWithHeuristics(children, false);
+		children = orderChildrenWithHeuristics(children, true);
 		for (int i = 0; i < children.size(); i++) {
 			childval = minimax(children.get(i), depth - 1, alpha, beta, false);
 			if (childval > maxval) {
@@ -164,22 +165,24 @@ public class MinimaxAlphaBeta extends Agent {
 			for (int i = 1; i < list.size(); i++) {
 				temp = list.get(i);
 				int j;
-				for (j = i - 1; j >= 0 && temp.state.getUtility() < list.get(j).state.getUtility(); j++) {
-					list.remove(j + i);
+				for (j = i - 1; j >= 0 && temp.state.getUtility() < list.get(j).state.getUtility(); j--) {
 					list.add(j + 1, list.get(j));
+					list.remove(j + 2);
 				}
 				list.add(j + 1, temp);
+				list.remove(j + 2);
 			}
 		}
 		else {
 			for (int i = 1; i < list.size(); i++) {
 				temp = list.get(i);
 				int j;
-				for (j = i - 1; j >= 0 && temp.state.getUtility() > list.get(j).state.getUtility(); j++) {
-					list.remove(j + i);
+				for (j = i - 1; j >= 0 && temp.state.getUtility() > list.get(j).state.getUtility(); j--) {
 					list.add(j + 1, list.get(j));
+					list.remove(j + 2);
 				}
 				list.add(j + 1, temp);
+				list.remove(j + 2);
 			}
 		}
 		return list;
