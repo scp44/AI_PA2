@@ -286,8 +286,9 @@ public class GameState {
 					}
 				}
 			}
-
+			return childNodes;
 		}
+
 		//Otherwise, we are getting the child nodes of an archer
 		else {
 			int firstArcherID = enemyUnitIDs.get(0);
@@ -345,11 +346,12 @@ public class GameState {
 					}
 				}
 			}
+			return childNodes;
 		}
 
 		// GameStateChild child = new GameStateChild()
 
-		return null;
+		
 	}
 
 	public int getDistance(UnitState unit1, UnitState unit2) {
