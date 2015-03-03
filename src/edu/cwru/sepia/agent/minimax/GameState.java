@@ -60,7 +60,7 @@ public class GameState {
 		}
 
 		public int x, y;
-
+ 
 		public MapLocation(int x, int y) {
 			this.x = x;
 			this.y = y;
@@ -70,16 +70,29 @@ public class GameState {
 			return GameState.this;
 		}
 	}
+	
+	
+	class UnitState {
+		private int xPosition, yPosition, unitHP, ID;
+		private boolean isDead;
+		private String type;
+		public UnitState(int x, int y, int hp, int id, boolean dead, String type) {
+			this.xPosition = x;
+			this.yPosition = y;
+			this.unitHP = hp;
+			this.ID = id;
+			this.isDead = dead; 
+			this.type = type;
+		}
+	}
 
 	private List<Integer> friendlyUnitIDs = new ArrayList<Integer>();
 	private List<Integer> enemyUnitIDs = new ArrayList<Integer>();
-	private Unit.UnitView[] friendlyArr;
-	private Unit.UnitView[] enemyArr;
 	private HashSet<MapLocation> resourceLocations = new HashSet<MapLocation>();
 	private int mapXExtent;
 	private int mapYExtent;
-	private State.StateView thisState;
-	private StateCreator creator;
+	private UnitState[] units = new UnitState[4];
+	private int numArchers; //We always have 2 footmen, only the number of archers will change, so store it 
 
 	/**
 	 * You will implement this constructor. It will extract all of the needed
@@ -109,26 +122,21 @@ public class GameState {
 		// Initialize the archers and footmen arrays here
 		friendlyUnitIDs = state.getUnitIds(0);
 		enemyUnitIDs = state.getUnitIds(1);
-		friendlyArr = new Unit.UnitView[friendlyUnitIDs.size()];
-		enemyArr = new Unit.UnitView[enemyUnitIDs.size()];
-		// Fill in the enemyArr with enemy UnitView objects
+		numArchers = enemyUnitIDs.size();
+		// Fill the units array with UnitState objects that tracks the stats of each unit (archers)
 		int index = 0;
-		for (Integer unitID : enemyUnitIDs) {
-			enemyArr[index++] = state.getUnit(unitID);
-		}
-		// Fill in the enemyArr with friendly UnitView objects
-		index = 0;
 		for (Integer unitID : friendlyUnitIDs) {
-			friendlyArr[index++] = state.getUnit(unitID);
+			units[index++] = new UnitState(state.getUnit(unitID).getXPosition(), state.getUnit(unitID).getYPosition(),
+					state.getUnit(unitID).getHP(), state.getUnit(unitID).getID(), state.getUnit(unitID).getHP() <= 0,
+					"footman");
 		}
-		/*for (int i = 0; i < 2; i++) {
-			System.out.println("A footmen unit at: (" + friendlyArr[i].getXPosition() + ", " 
-					+ friendlyArr[i].getYPosition() + ")");
+		// Fill the units array with UnitState objects that tracks the stats of each unit (footmen)
+		for (Integer unitID : enemyUnitIDs) {
+			units[index++] = new UnitState(state.getUnit(unitID).getXPosition(), state.getUnit(unitID).getYPosition(),
+					state.getUnit(unitID).getHP(), state.getUnit(unitID).getID(), state.getUnit(unitID).getHP() <= 0,
+					"archers");
 		}
-		for (int i = 0; i < 2; i++) {
-			System.out.println("A archer unit at: (" + enemyArr[i].getXPosition() + ", " 
-					+ enemyArr[i].getYPosition() + ")");
-		}*/
+
 		// Get the resource IDs
 		List<Integer> resourceIDs = state.getAllResourceIds();
 		// Store the resource locations into a HashSet (resourceLocations),
@@ -145,12 +153,20 @@ public class GameState {
 		// Get the boundaries (size) of the entire map s
 		mapXExtent = state.getXExtent();
 		mapYExtent = state.getYExtent();
-		try {
-			creator = state.getStateCreator();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+	}
+	
+	public GameState(GameState newState) {
+		//Initializes the new GameState object with the same fields as the one passed in
+		//Basically making a copy of a GameState object
+		this.friendlyUnitIDs = newState.friendlyUnitIDs;
+		this.enemyUnitIDs = newState.enemyUnitIDs;
+
+		this.resourceLocations = newState.resourceLocations;
+		this.mapXExtent = newState.mapXExtent;
+		this.mapYExtent = newState.mapYExtent;
+		this.units = newState.units;
+		this.numArchers = newState.numArchers;
 	}
 
 	/**
@@ -176,16 +192,19 @@ public class GameState {
 	public double getUtility() {
 		int tempMin = Integer.MAX_VALUE;
 		int runningCount = 0;
-		// Calculate the minimum distance between pairs of archers/footment, and
+		// Calculate the minimum distance between pairs of archers/footmen, and
 		// take the sum of
 		// those minimum values
-		for (int i = 0; i < friendlyArr.length; i++) {
-			for (int j = 0; j < enemyArr.length; j++) {
-				tempMin = tempMin > getDistance(friendlyArr[i], enemyArr[j]) ? getDistance(
-						friendlyArr[i], enemyArr[j]) : tempMin;
+		for (int i = 0; i < 2; i++) {
+			for (int j = 2; j < 2 + numArchers; j++) {
+				tempMin = tempMin > getDistance(units[i], units[j]) ? getDistance(
+						units[i], units[j]) : tempMin;
 			}
 			runningCount += tempMin;
 		}
+		
+		//10 * (-dist) + (footmenHP - archerHP)
+		
 		// Return the utility of the state as the inverse of the sum of mins;
 		// ie: when archers and footmen
 		// are far apart, the utility is low, and vice versa
@@ -215,10 +234,11 @@ public class GameState {
 		if (playerTurn) {
 			int firstFootmenID = friendlyUnitIDs.get(0);
 			int secondFootmenID = friendlyUnitIDs.get(1);
-			int footmen1X = friendlyArr[0].getXPosition();
-			int footmen1Y = friendlyArr[0].getYPosition();
-			int footmen2X = friendlyArr[1].getXPosition();
-			int footmen2Y = friendlyArr[1].getYPosition();
+			//Get the coordinates of the 2 footmen
+			int footmen1X = units[0].xPosition;
+			int footmen1Y = units[0].yPosition;
+			int footmen2X = units[1].xPosition;
+			int footmen2Y = units[1].yPosition;
 			//Iterate over all the possible directions starting with the first footmen
 			for (Direction direction : Direction.values()) {
 				int dirX = direction.xComponent();
@@ -253,29 +273,15 @@ public class GameState {
 									footmen2X + dir2X, footmen2Y + dir2Y);
 							unitActions.put(firstFootmenID, footAct);
 							unitActions.put(secondFootmenID, footAct2);
-							State childState = creator.createState();
-							System.out.println("Footmen's initial position is: (" + 
-									childState.getUnit(firstFootmenID).getxPosition() + ", " + 
-									childState.getUnit(firstFootmenID).getyPosition() + ")");
-							childState.moveUnit(childState.getUnit(firstFootmenID), direction);
-							childState.moveUnit(childState.getUnit(secondFootmenID), direction2);
+		
+							GameState childState = new GameState(this);
+							//Manually change the positions of the footmen via the UnitState object
+							childState.units[0].xPosition = footmen1X + dirX;
+							childState.units[0].yPosition = footmen1Y + dirY;
+							childState.units[1].xPosition = footmen2X + dir2X;
+							childState.units[1].yPosition = footmen2Y + dir2Y;
+							childNodes.add(new GameStateChild(unitActions, childState));
 							
-							GameState dummy = new GameState(childState.getView(0));
-							System.out.println("New state's 1st footmen location: (" + 
-									dummy.friendlyArr[0].getXPosition() + ", " + 
-									dummy.friendlyArr[0].getYPosition() + ")");
-							System.out.println("New state's 2nd footmen location: (" + 
-									dummy.friendlyArr[1].getXPosition() + ", " + 
-									dummy.friendlyArr[1].getYPosition() + ")");
-							childNodes.add(new GameStateChild(unitActions, new GameState(childState.getView(0))));
-							
-							/*unitActions.put(firstFootmenID, footAct);
-							unitActions.put(secondFootmenID, footAct2);
-							State builder = new State();
-							//footmenPlayer.addUnit();
-							builder.addPlayer(0);
-							builder.addPlayer(1);
-							Unit footmen1 = new Unit(null, 0);*/
 						}
 					}
 				}
@@ -288,10 +294,10 @@ public class GameState {
 		return null;
 	}
 
-	public int getDistance(Unit.UnitView unit1, Unit.UnitView unit2) {
+	public int getDistance(UnitState unit1, UnitState unit2) {
 		int distance = 0;
-		distance = ((unit2.getXPosition() - unit1.getXPosition()) ^ 2
-				+ (unit2.getYPosition() - unit1.getYPosition()) ^ 2)
+		distance = ((unit2.xPosition - unit1.xPosition) ^ 2
+				+ (unit2.yPosition - unit1.yPosition) ^ 2)
 				^ (1 / 2);
 		return distance;
 	}
