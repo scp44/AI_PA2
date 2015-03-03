@@ -369,6 +369,14 @@ public class AstarAgent extends Agent {
 
         return AstarSearch(startLoc, goalLoc, state.getXExtent(), state.getYExtent(), footmanLoc, resourceLocations);
     }
+    
+    //calls AstarSearch, returns smallest number of "hops" from one location to another
+    public double getHopDistance(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation otherFootmanLoc, HashSet<MapLocation> resourceLocations){
+    	
+    	Stack<MapLocation> foundPath = AstarSearch(start, goal, xExtent, yExtent, otherFootmanLoc, resourceLocations);
+    	return (double)foundPath.size();
+    }
+    
     /**
      * This is the method you will implement for the assignment. Your implementation
      * will use the A* algorithm to compute the optimum path from the start position to
