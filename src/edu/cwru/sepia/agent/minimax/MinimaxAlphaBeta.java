@@ -82,8 +82,8 @@ public class MinimaxAlphaBeta extends Agent {
 	 */
 	public GameStateChild alphaBetaSearch(GameStateChild node, int depth,
 			double alpha, double beta) {
-		int maxval = -infinity;
-		int childval;
+		double maxval = -infinity;
+		double childval;
 
 		List<GameStateChild> children = new ArrayList<GameStateChild>();
 		children = node.state.getChildren(true);
@@ -100,9 +100,9 @@ public class MinimaxAlphaBeta extends Agent {
 		return node;
 	}
 
-	public int minimax(GameStateChild node, int depth, double alpha,
+	public double minimax(GameStateChild node, int depth, double alpha,
 			double beta, boolean maximizingPlayer) {
-		int v = 0;
+		double v = 0;
 		List<GameStateChild> children = new ArrayList<GameStateChild>();
 		children = node.state.getChildren(maximizingPlayer);
 		children = orderChildrenWithHeuristics(children, maximizingPlayer);
