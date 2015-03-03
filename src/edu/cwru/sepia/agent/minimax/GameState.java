@@ -231,6 +231,7 @@ public class GameState {
 	public List<GameStateChild> getChildren(boolean playerTurn) {
 		List<GameStateChild> childNodes = new ArrayList<GameStateChild>();
 		Map<Integer, Action> unitActions = new HashMap<Integer, Action>();
+		//If it's the player's turn (our turn), we look at all the possible footmen moves
 		if (playerTurn) {
 			int firstFootmenID = friendlyUnitIDs.get(0);
 			int secondFootmenID = friendlyUnitIDs.get(1);
@@ -281,12 +282,69 @@ public class GameState {
 							childState.units[1].xPosition = footmen2X + dir2X;
 							childState.units[1].yPosition = footmen2Y + dir2Y;
 							childNodes.add(new GameStateChild(unitActions, childState));
-							
 						}
 					}
 				}
 			}
 
+		}
+		//Otherwise, we are getting the child nodes of an archer
+		else {
+			int firstArcherID = enemyUnitIDs.get(0);
+			//Get the coordinates of the 2 archers
+			int archer1X = units[2].xPosition;
+			int archer1Y = units[2].yPosition;
+			//Iterate over all the possible directions starting with the first archer
+			for (Direction direction : Direction.values()) {
+				int dirX = direction.xComponent();
+				int dirY = direction.yComponent();
+				// A big conditional to check that the direction of the move is
+				// not colliding with an obstacle,
+				// is not a diagonal move (not allowed), and is within the
+				// boundaries of the map
+				if ((dirX == 0 || dirY == 0)
+						&& !resourceLocations.contains(new MapLocation(archer1X
+								+ dirX, archer1Y + dirY))
+								&& archer1Y + dirY >= 0 && archer1X + dirX >= 0
+								&& archer1Y + dirY <= mapYExtent
+								&& archer1X + dirX <= mapXExtent) {
+					//Create the action for footmen1 to move towards direction
+					Action footAct = Action.createCompoundMove(firstArcherID,
+							archer1X + dirX, archer1Y + dirY);
+
+					//An inner loop that will iterate over the moves of the second archer (if it exists)
+					if (numArchers > 1) {
+						int secondArcherID = friendlyUnitIDs.get(1);
+						int archer2X = units[3].xPosition;
+						int archer2Y = units[3].yPosition;
+						for (Direction direction2 : Direction.values()) {
+							int dir2X = direction2.xComponent();
+							int dir2Y = direction2.yComponent();
+							//Same as the first footmen; check that the next move is legal
+							if ((dir2X == 0 || dir2Y == 0)
+									&& !resourceLocations.contains(new MapLocation(archer2X
+											+ dir2X, archer2Y + dir2Y))
+											&& archer2Y + dir2Y >= 0 && archer2X + dir2X >= 0
+											&& archer2Y + dir2Y <= mapYExtent
+											&& archer2X + dir2X <= mapXExtent) {
+								//Create the action for the second footmen to move towards direction2
+								Action footAct2 = Action.createCompoundMove(secondArcherID,
+										archer2X + dir2X, archer2Y + dir2Y);
+								unitActions.put(firstArcherID, footAct);
+								unitActions.put(secondArcherID, footAct2);
+
+								GameState childState = new GameState(this);
+								//Manually change the positions of the footmen via the UnitState object
+								childState.units[0].xPosition = archer1X + dirX;
+								childState.units[0].yPosition = archer1Y + dirY;
+								childState.units[1].xPosition = archer2X + dir2X;
+								childState.units[1].yPosition = archer2Y + dir2Y;
+								childNodes.add(new GameStateChild(unitActions, childState));
+							}
+						}
+					}
+				}
+			}
 		}
 
 		// GameStateChild child = new GameStateChild()
