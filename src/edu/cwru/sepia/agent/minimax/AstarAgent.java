@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.util.*;
 
 public class AstarAgent extends Agent {
-
     class MapLocation
     {
         public int x, y;
@@ -480,7 +479,7 @@ public class AstarAgent extends Agent {
         		if(enemyFootmanLoc != null)
         			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
         		else
-        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
+        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations);
 
         		for(int x = 0; x < neighborList.length && neighborList[x] != null; x++)
         		{

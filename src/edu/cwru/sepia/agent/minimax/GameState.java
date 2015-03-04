@@ -103,6 +103,8 @@ public class GameState {
 	private List<Integer> friendlyUnitIDs = new ArrayList<Integer>();
 	private List<Integer> enemyUnitIDs = new ArrayList<Integer>();
 	private HashSet<MapLocation> resourceLocations = new HashSet<MapLocation>();
+	private HashSet<AstarAgent.MapLocation> AstarResourceLocations = new HashSet<AstarAgent.MapLocation>();
+	AstarAgent searchAgent = new AstarAgent(0);
 	private int mapXExtent;
 	private int mapYExtent;
 	//units[0] and units[1] are footmen; units[2] and units [3] are archers
@@ -171,6 +173,8 @@ public class GameState {
 				//	resource.getYPosition() + ")");
 			resourceLocations.add(new MapLocation(resource.getXPosition(),
 					resource.getYPosition()));
+			AstarResourceLocations.add(searchAgent.new MapLocation(resource.getXPosition(),
+					resource.getYPosition(), null, 0));
 		}
 		// Get the boundaries (size) of the entire map s
 		mapXExtent = state.getXExtent();
@@ -236,16 +240,16 @@ public class GameState {
 				else
 					otherArcherPos = j-1;
 				
-				AstarAgent.MapLocation footmanLoc = new AstarAgent.MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
-				AstarAgent.MapLocation archerLoc = new AstarAgent.MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
+				AstarAgent.MapLocation footmanLoc = searchAgent.new MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
+				AstarAgent.MapLocation archerLoc = searchAgent.new MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
 				AstarAgent.MapLocation otherArcherLoc;
 				if(units[otherArcherPos] == null)
 					otherArcherLoc = null;
 				else
-					otherArcherLoc = new AstarAgent.MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
+					otherArcherLoc = searchAgent.new MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
 				
-				tempMin = tempMin > AstarAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
-																otherArcherLoc, resourceLocations)
+				tempMin = tempMin > searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
+																otherArcherLoc, AstarResourceLocations)
 						? getDistance(units[i], units[j]) : tempMin;
 			}
 			distanceMetric += tempMin;
