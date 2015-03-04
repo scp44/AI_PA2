@@ -235,7 +235,7 @@ public class GameState {
 		for (int i = 0; i < numFootmen; i++) {
 			for (int j = numFootmen; j < numFootmen + numArchers; j++) {
 				int otherArcherPos;
-				if(j < numFootmen + numArchers)
+				if(j < numFootmen + numArchers - 1)
 					otherArcherPos = j+1;
 				else
 					otherArcherPos = j-1;
