@@ -323,11 +323,16 @@ public class AstarAgent extends Agent {
      */
     private boolean shouldReplanPath(State.StateView state, History.HistoryView history, Stack<MapLocation> currentPath)
     {
+
     	Unit.UnitView footmanUnit = state.getUnit(footmanID);
     	Unit.UnitView enemyUnit = null;
     	if(enemyFootmanID != -1) {
     		enemyUnit = state.getUnit(enemyFootmanID);
     	}
+    	
+    	if(enemyUnit == null)
+    		return false;
+    	
     	MapLocation enemyLoc = new MapLocation(enemyUnit.getXPosition(), enemyUnit.getYPosition(), null, 0);
     	
     	Iterator<MapLocation> it = currentPath.iterator();
@@ -520,7 +525,7 @@ public class AstarAgent extends Agent {
     {
     	Stack<MapLocation> path = new Stack<MapLocation>();
     	path.add(current);
-    	
+    	System.out.println(current.cameFrom);
     	while(!(current.cameFrom.equals(start)))
     	{
     		current = current.cameFrom;
