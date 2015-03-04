@@ -86,6 +86,19 @@ public class AstarAgent extends Agent {
     		super(initLength, new OpenListCompare());
     	}
     	
+    	public float nodeCost(MapLocation loc) {
+    		if (this.isEmpty()) 
+        		return 0;
+        	Iterator<MapLocation> it = this.iterator();
+        	while (it.hasNext()) {
+        		MapLocation location = it.next();
+    			if(location.x == loc.x && location.y == loc.y) {
+    				return location.cost;
+    			}
+    	    }
+        	return 0;
+    	}
+    	
     	public boolean contains(MapLocation loc) {
         	
         	if (this.isEmpty()) 
@@ -475,7 +488,7 @@ public class AstarAgent extends Agent {
         			
         			temp_g = current.cost + 1;
         			
-        			if(!(openList.contains(neighbor)) || temp_g < neighbor.cost )
+        			if(!(openList.contains(neighbor)) || temp_g < openList.nodeCost(neighbor))
         			{
         				neighbor.cameFrom = current;
         				neighbor.cost = temp_g;
