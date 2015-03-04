@@ -260,7 +260,7 @@ public class GameState {
 		
 		List<GameStateChild> childNodes = new ArrayList<GameStateChild>();
 		Map<Integer, Action> unitActions = new HashMap<Integer, Action>();
-		GameState childState = new GameState(this);
+		//GameState childState = new GameState(this);
 		//If it's the player's turn (our turn), we look at all the possible footmen moves
 		if (playerTurn) {
 			int firstFootmenID;
@@ -296,6 +296,7 @@ public class GameState {
 			}
 			//Iterate over all the possible directions starting with the first footmen
 			for (Direction direction : Direction.values()) {
+				GameState childState = new GameState(this);
 				int dirX = direction.xComponent();
 				int dirY = direction.yComponent();
 				// A big conditional to check that the direction of the move is
@@ -341,8 +342,8 @@ public class GameState {
 					}
 					//If not close enough to attack, then create the action for footmen1 to move towards direction
 					else {
-						footAct = Action.createCompoundMove(firstFootmenID,
-								footmen1X + dirX, footmen1Y + dirY);
+						footAct = Action.createPrimitiveMove(firstFootmenID,
+								direction);
 					}
 					childState.units[0].xPosition = footmen1X + dirX;
 					childState.units[0].yPosition = footmen1Y + dirY;
@@ -352,10 +353,13 @@ public class GameState {
 					}
 					//An inner loop that will iterate over the moves of the second footmen
 					for (Direction direction2 : Direction.values()) {
+						
 						//If the one of the two footmen is dead, break out of this loop
 						if (friendlyUnitIDs.size() < 2) {
 							break;
 						}
+						childState.units[0].xPosition = footmen1X + dirX;
+						childState.units[0].yPosition = footmen1Y + dirY;
 						int secondFootmenID = friendlyUnitIDs.get(1);
 						int dir2X = direction2.xComponent();
 						int dir2Y = direction2.yComponent();
@@ -387,8 +391,8 @@ public class GameState {
 							}
 							//If not close enough to attack, then create the action for footmen1 to move towards direction
 							else {
-								footAct2 = Action.createCompoundMove(secondFootmenID,
-										footmen2X + dir2X, footmen2Y + dir2Y);
+								footAct2 = Action.createPrimitiveMove(secondFootmenID,
+										direction2);
 							}
 							unitActions.put(firstFootmenID, footAct);
 							unitActions.put(secondFootmenID, footAct2);
@@ -397,11 +401,10 @@ public class GameState {
 							//Manually change the positions of the footmen via the UnitState object
 							childState.units[1].xPosition = footmen2X + dir2X;
 							childState.units[1].yPosition = footmen2Y + dir2Y;
-							childNodes.add(new GameStateChild(unitActions, childState));
+							GameState tempState = new GameState(childState);
+							childNodes.add(new GameStateChild(unitActions, new GameState(childState)));
 						}
 					}
-					
-					
 				}
 			}
 			return childNodes;
@@ -409,12 +412,14 @@ public class GameState {
 
 		//Otherwise, we are getting the child nodes of an archer
 		else {
+			
 			int firstArcherID = enemyUnitIDs.get(0);
 			//Get the coordinates of the 2 archers
 			int archer1X = units[2].xPosition;
 			int archer1Y = units[2].yPosition;
 			//Iterate over all the possible directions starting with the first archer
 			for (Direction direction : Direction.values()) {
+				GameState childState = new GameState(this);
 				int dirX = direction.xComponent();
 				int dirY = direction.yComponent();
 				// A big conditional to check that the direction of the move is
