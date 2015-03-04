@@ -221,7 +221,7 @@ public class GameState {
 	 * @return The weighted linear combination of the features
 	 */
 	public double getUtility() {
-		int tempMin = Integer.MAX_VALUE;
+		double tempMin = (double)Integer.MAX_VALUE;
 		int distanceMetric = 0;
 		// Calculate the minimum distance between pairs of archers/footmen, and
 		// take the sum of
@@ -250,8 +250,10 @@ public class GameState {
 				
 				tempMin = tempMin > searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
 																otherArcherLoc, AstarResourceLocations)
-						? getDistance(units[i], units[j]) : tempMin;
+						? searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
+								otherArcherLoc, AstarResourceLocations) : tempMin;
 			}
+			System.out.println("Temp min is: " + tempMin);
 			distanceMetric += tempMin;
 		}
 		
@@ -268,7 +270,7 @@ public class GameState {
 			else
 				hpMetric -= units[j].unitHP;
 		}
-		return hpMetric;
+		return hpMetric - distanceMetric;
 	}
 
 	/**
