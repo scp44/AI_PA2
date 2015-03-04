@@ -416,9 +416,16 @@ public class GameState {
 		else {
 			
 			int firstArcherID = enemyUnitIDs.get(0);
+			int archerIndex;
+			if (friendlyUnitIDs.size() < 2) {
+				archerIndex = 1;
+			}
+			else {
+				archerIndex = 2;
+			}
 			//Get the coordinates of the 2 archers
-			int archer1X = units[2].xPosition;
-			int archer1Y = units[2].yPosition;
+			int archer1X = units[archerIndex].xPosition;
+			int archer1Y = units[archerIndex].yPosition;
 			//Iterate over all the possible directions starting with the first archer
 			for (Direction direction : Direction.values()) {
 				GameState childState = new GameState(this);
@@ -435,7 +442,6 @@ public class GameState {
 								&& archer1Y + dirY <= mapYExtent
 								&& archer1X + dirX <= mapXExtent) {
 					Action archerAct;
-					int archerIndex;
 					if (friendlyUnitIDs.size() < 2) {
 						archerIndex = 1;
 					}
@@ -453,7 +459,7 @@ public class GameState {
 						//Then it will still shoot the first one
 						else 
 							archerAct = Action.createPrimitiveAttack(firstArcherID, friendlyUnitIDs.get(1));
-							childState.units[1].unitHP -= childState.units[2].basicAtt;
+							childState.units[1].unitHP -= childState.units[archerIndex].basicAtt;
 					}
 					//Create the action for footmen1 to move towards direction
 					else {
@@ -461,8 +467,8 @@ public class GameState {
 								archer1X + dirX, archer1Y + dirY);
 					}
 							
-					childState.units[2].xPosition = archer1X + dirX;
-					childState.units[2].yPosition = archer1Y + dirY;
+					childState.units[archerIndex].xPosition = archer1X + dirX;
+					childState.units[archerIndex].yPosition = archer1Y + dirY;
 					//An inner loop that will iterate over the moves of the second archer (if it exists)
 					if (numArchers > 1) {
 						int secondArcherID = enemyUnitIDs.get(1);
