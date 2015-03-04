@@ -176,6 +176,7 @@ public class GameState {
 			AstarResourceLocations.add(searchAgent.new MapLocation(resource.getXPosition(),
 					resource.getYPosition(), null, 0));
 		}
+		System.out.println("Astarresources: " + AstarResourceLocations.size());
 		// Get the boundaries (size) of the entire map s
 		mapXExtent = state.getXExtent();
 		mapYExtent = state.getYExtent();
@@ -190,6 +191,7 @@ public class GameState {
 		enemyUnitIDs.addAll(0, newState.enemyUnitIDs); 
 		
 		resourceLocations = new HashSet<MapLocation>(newState.resourceLocations);
+		AstarResourceLocations = new HashSet<AstarAgent.MapLocation>(newState.AstarResourceLocations);
 		mapXExtent = newState.mapXExtent;
 		mapYExtent = newState.mapYExtent;
 		int j = 0;
