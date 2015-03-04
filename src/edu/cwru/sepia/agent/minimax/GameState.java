@@ -84,6 +84,15 @@ public class GameState {
 			this.range = range;
 			this.type = type;
 		}
+		public UnitState(UnitState unitState) {
+			this.xPosition = unitState.xPosition;
+			this.yPosition = unitState.yPosition;
+			this.unitHP = unitState.unitHP;
+			this.ID = unitState.ID;
+			this.basicAtt = unitState.basicAtt;
+			this.range = unitState.range;
+			this.type = unitState.type;
+		}
 	}
 
 	private List<Integer> friendlyUnitIDs = new ArrayList<Integer>();
@@ -167,13 +176,18 @@ public class GameState {
 	public GameState(GameState newState) {
 		//Initializes the new GameState object with the same fields as the one passed in
 		//Basically making a copy of a GameState object
-		friendlyUnitIDs = newState.friendlyUnitIDs;
-		enemyUnitIDs = newState.enemyUnitIDs;
 
-		resourceLocations = newState.resourceLocations;
+		friendlyUnitIDs.addAll(0, newState.friendlyUnitIDs); 
+		enemyUnitIDs.addAll(0, newState.enemyUnitIDs); 
+		
+		resourceLocations = new HashSet<MapLocation>(newState.resourceLocations);
 		mapXExtent = newState.mapXExtent;
 		mapYExtent = newState.mapYExtent;
-		units = newState.units;
+		int j = 0;
+		while (j < 4 && newState.units[j] != null) {
+			units[j] = new UnitState(newState.units[j]);
+			j++;
+		}
 		numArchers = newState.numArchers;
 	}
 
@@ -230,7 +244,7 @@ public class GameState {
 			else
 				hpMetric -= units[j].unitHP;
 		}
-		return hpMetric - distanceMetric;
+		return hpMetric - 10 * distanceMetric;
 	}
 
 	/**
@@ -355,12 +369,14 @@ public class GameState {
 					}
 					//An inner loop that will iterate over the moves of the second footmen
 					for (Direction direction2 : Direction.values()) {
+						GameState innerState = new GameState(childState);
+						Map<Integer, Action> innerActions = new HashMap<Integer, Action>();
 						//If the one of the two footmen is dead, break out of this loop
 						if (friendlyUnitIDs.size() < 2) {
 							break;
 						}
-						childState.units[0].xPosition = footmen1X + dirX;
-						childState.units[0].yPosition = footmen1Y + dirY;
+						innerState.units[0].xPosition = footmen1X + dirX;
+						innerState.units[0].yPosition = footmen1Y + dirY;
 						int secondFootmenID = friendlyUnitIDs.get(1);
 						int dir2X = direction2.xComponent();
 						int dir2Y = direction2.yComponent();
@@ -381,13 +397,13 @@ public class GameState {
 								if (isAdjacent(this.units[1], this.units[2])) {
 
 									footAct2 = Action.createPrimitiveAttack(secondFootmenID, enemyUnitIDs.get(0));
-									childState.units[2].unitHP -= childState.units[1].basicAtt;
+									innerState.units[2].unitHP -= innerState.units[1].basicAtt;
 								}
 								//Otherwise adjacent to the second enemy archer; Note, if adjacent to both archers,
 								//then the footman will still attack the first one
 								else {
 									footAct2 = Action.createPrimitiveAttack(secondFootmenID, enemyUnitIDs.get(1));
-									childState.units[3].unitHP -= childState.units[1].basicAtt;
+									innerState.units[3].unitHP -= innerState.units[1].basicAtt;
 								}
 							}
 							//If not close enough to attack, then create the action for footmen1 to move towards direction
@@ -395,15 +411,15 @@ public class GameState {
 								footAct2 = Action.createPrimitiveMove(secondFootmenID,
 										direction2);
 							}
-							unitActions.put(firstFootmenID, footAct);
-							unitActions.put(secondFootmenID, footAct2);
+							innerActions.put(firstFootmenID, footAct);
+							innerActions.put(secondFootmenID, footAct2);
 		
 							
 							//Manually change the positions of the footmen via the UnitState object
-							childState.units[1].xPosition = footmen2X + dir2X;
-							childState.units[1].yPosition = footmen2Y + dir2Y;
+							innerState.units[1].xPosition = footmen2X + dir2X;
+							innerState.units[1].yPosition = footmen2Y + dir2Y;
 							//GameState tempState = new GameState(childState);
-							childNodes.add(new GameStateChild(unitActions, childState));
+							childNodes.add(new GameStateChild(innerActions, innerState));
 							
 						}
 					}
@@ -475,8 +491,12 @@ public class GameState {
 						int archer2X = units[archerIndex + 1].xPosition;
 						int archer2Y = units[archerIndex + 1].yPosition;
 						for (Direction direction2 : Direction.values()) {
+							GameState innerState = new GameState(childState);
+							Map<Integer, Action> innerActions = new HashMap<Integer, Action>();
 							int dir2X = direction2.xComponent();
 							int dir2Y = direction2.yComponent();
+							innerState.units[archerIndex].xPosition = archer1X + dirX;
+							innerState.units[archerIndex].yPosition = archer1Y + dirY;
 							//check that the next move is legal
 							if ((dir2X == 0 || dir2Y == 0)
 									&& !resourceLocations.contains(new MapLocation(archer2X
@@ -490,12 +510,12 @@ public class GameState {
 									//If within range of first footmen, shoot it
 									if (getDistance(this.units[0], this.units[archerIndex + 1]) <= this.units[archerIndex + 1].range) {
 										archerAct2 = Action.createPrimitiveAttack(secondArcherID, friendlyUnitIDs.get(0));
-										childState.units[0].unitHP -= childState.units[archerIndex + 1].basicAtt;
+										innerState.units[0].unitHP -= innerState.units[archerIndex + 1].basicAtt;
 									}
 
 									else {
 										archerAct2 = Action.createPrimitiveAttack(secondArcherID, friendlyUnitIDs.get(1));
-										childState.units[1].unitHP -= childState.units[archerIndex + 1].basicAtt;
+										innerState.units[1].unitHP -= innerState.units[archerIndex + 1].basicAtt;
 									}
 								}
 								//Create the action for archer2 to move towards direction
@@ -503,13 +523,13 @@ public class GameState {
 									archerAct2 = Action.createCompoundMove(firstArcherID,
 											archer1X + dirX, archer1Y + dirY);
 								}
-								unitActions.put(firstArcherID, archerAct);
-								unitActions.put(secondArcherID, archerAct2);
+								innerActions.put(firstArcherID, archerAct);
+								innerActions.put(secondArcherID, archerAct2);
 
 								//Manually change the positions of the footmen and archers via the UnitState object								
-								childState.units[archerIndex + 1].xPosition = archer2X + dir2X;
-								childState.units[archerIndex + 1].yPosition = archer2Y + dir2Y;
-								childNodes.add(new GameStateChild(unitActions, childState));
+								innerState.units[archerIndex + 1].xPosition = archer2X + dir2X;
+								innerState.units[archerIndex + 1].yPosition = archer2Y + dir2Y;
+								childNodes.add(new GameStateChild(innerActions, innerState));
 							}
 						}
 					}
