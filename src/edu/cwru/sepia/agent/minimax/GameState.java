@@ -252,8 +252,10 @@ public class GameState {
 	 */
 	public List<GameStateChild> getChildren(boolean playerTurn) {
 		//First check if all archers or all footmen are dead
-		if ((units[0].unitHP <= 0 && units[1].unitHP <= 0) || (units[2].unitHP <= 0 && (units[3] == null || 
-				units[3].unitHP <= 0))) {
+		if (((units[3] == null || units[0].unitHP <= 0)
+				&& (units[1] == null || units[1].unitHP <= 0))
+				|| ((units[2] == null || units[2].unitHP <= 0)
+						&& (units[3] == null || units[3].unitHP <= 0))) {
 			
 		}
 		
