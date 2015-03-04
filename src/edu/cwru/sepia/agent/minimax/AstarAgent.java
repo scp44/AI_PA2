@@ -474,8 +474,14 @@ public class AstarAgent extends Agent {
             	    }
                 	return foundPath;
         		}
-        		        		
-        		MapLocation[] neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
+        		
+        		MapLocation[] neighborList;
+        		
+        		if(enemyFootmanLoc != null)
+        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
+        		else
+        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations);
+
 
         		for(int x = 0; x < neighborList.length && neighborList[x] != null; x++)
         		{
@@ -535,7 +541,7 @@ public class AstarAgent extends Agent {
     
     private MapLocation[] getNeighbor(MapLocation current, int xExtent, int yExtent, Set<MapLocation> resourceLocations, MapLocation enemyFootmanLoc) 
     {
-    	MapLocation[] neighbors = new MapLocation[8];
+    	MapLocation[] neighbors = new MapLocation[4];
     	int index = 0;
 		if(current.x - 1 >= 0 && current.y >= 0 && !resourceLocations.contains( 
 				new MapLocation(current.x - 1, current.y, null, 0)) && !(enemyFootmanLoc.x == current.x - 1
@@ -560,21 +566,29 @@ public class AstarAgent extends Agent {
 		return neighbors;
     }
     
+    private MapLocation[] getNeighbor(MapLocation current, int xExtent, int yExtent, Set<MapLocation> resourceLocations) 
+    {
+    	MapLocation[] neighbors = new MapLocation[4];
+    	int index = 0;
+		if(current.x - 1 >= 0 && current.y >= 0 && !resourceLocations.contains( 
+				new MapLocation(current.x - 1, current.y, null, 0))) {
+			neighbors[index++] = new MapLocation(current.x - 1, current.y, current, current.cost + 1);
+		}
+		if(current.x >= 0 && current.y - 1 >= 0 && !resourceLocations.contains(
+				new MapLocation(current.x, current.y - 1, null, 0))) {
+			neighbors[index++] = new MapLocation(current.x, current.y - 1, current, current.cost + 1);
+		}
+		if(current.x >= 0 && current.y + 1 < yExtent && !resourceLocations.contains(
+				new MapLocation(current.x, current.y + 1, null, 0))) {
+			neighbors[index++] = new MapLocation(current.x, current.y + 1, current, current.cost + 1);
+		}
+		if(current.x + 1 < xExtent && current.y >= 0 && !resourceLocations.contains(
+				new MapLocation(current.x + 1, current.y, null, 0))) {
+			neighbors[index++] = new MapLocation(current.x + 1, current.y, current, current.cost + 1);
+		}
+		return neighbors;
+    }
     
-    //Obselete method 
-    /*private boolean setContains(Set<MapLocation> set, MapLocation loc) {
-    	
-    	if (set.isEmpty()) 
-    		return false;
-    	Iterator<MapLocation> it = set.iterator();
-    	while (it.hasNext()) {
-    		MapLocation location = it.next();
-			if(location.x == loc.x && location.y == loc.y) {
-				return true;
-			}
-	    }
-    	return false;
-    }*/
     /**
      * Primitive actions take a direction (e.g. NORTH, NORTHEAST, etc)
      * This converts the difference between the current position and the
