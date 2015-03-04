@@ -14,6 +14,9 @@ import edu.cwru.sepia.util.Direction;
 import java.io.IOException;
 import java.util.*;
 
+import edu.cwru.sepia.agent.minimax.AstarAgent;
+import edu.cwru.sepia.agent.minimax.AstarAgent.MapLocation;
+
 /**
  * This class stores all of the information the agent needs to know about the
  * state of the game. For example this might include things like footmen HP and
@@ -60,6 +63,8 @@ public class GameState {
 		}
 
 		public int x, y;
+		MapLocation cameFrom;
+        public float estTotalCost, cost;
  
 		public MapLocation(int x, int y) {
 			this.x = x;
@@ -225,8 +230,23 @@ public class GameState {
 			numFootmen = 2;
 		for (int i = 0; i < numFootmen; i++) {
 			for (int j = numFootmen; j < numFootmen + numArchers; j++) {
-				tempMin = tempMin > getDistance(units[i], units[j]) ? getDistance(
-						units[i], units[j]) : tempMin;
+				int otherArcherPos;
+				if(j < numFootmen + numArchers)
+					otherArcherPos = j+1;
+				else
+					otherArcherPos = j-1;
+				
+				AstarAgent.MapLocation footmanLoc = new AstarAgent.MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
+				AstarAgent.MapLocation archerLoc = new AstarAgent.MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
+				AstarAgent.MapLocation otherArcherLoc;
+				if(units[otherArcherPos] == null)
+					otherArcherLoc = null;
+				else
+					otherArcherLoc = new AstarAgent.MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
+				
+				tempMin = tempMin > AstarAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
+																otherArcherLoc, resourceLocations)
+						? getDistance(units[i], units[j]) : tempMin;
 			}
 			distanceMetric += tempMin;
 		}

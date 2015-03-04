@@ -480,8 +480,7 @@ public class AstarAgent extends Agent {
         		if(enemyFootmanLoc != null)
         			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
         		else
-        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations);
-
+        			neighborList = getNeighbor(current, xExtent, yExtent, resourceLocations, enemyFootmanLoc);
 
         		for(int x = 0; x < neighborList.length && neighborList[x] != null; x++)
         		{
