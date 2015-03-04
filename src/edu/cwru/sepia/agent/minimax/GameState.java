@@ -575,4 +575,6 @@ public class GameState {
 		return ((Math.abs(unit1.xPosition - unit2.xPosition) <= 1 && unit1.yPosition == unit2.yPosition) 
 				|| (Math.abs(unit1.yPosition - unit2.yPosition) <= 1 && unit1.xPosition == unit2.xPosition));
 	}
+	
+	
 }
