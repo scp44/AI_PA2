@@ -244,7 +244,7 @@ public class GameState {
 			else
 				hpMetric -= units[j].unitHP;
 		}
-		return hpMetric - 10 * distanceMetric;
+		return hpMetric;
 	}
 
 	/**
