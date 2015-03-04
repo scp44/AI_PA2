@@ -25,7 +25,7 @@ public class MinimaxAlphaBeta extends Agent {
 		}
 
 		//numPlys = Integer.parseInt(args[0]);
-		numPlys = 1;
+		numPlys = 5;
 		System.out.println("Number of plys is: " + numPlys);
 	}
 
@@ -107,7 +107,7 @@ public class MinimaxAlphaBeta extends Agent {
 		List<GameStateChild> children = new ArrayList<GameStateChild>();
 		children = node.state.getChildren(maximizingPlayer);
 		children = orderChildrenWithHeuristics(children, maximizingPlayer);
-		if (depth == 0 || children.size() == 0) {
+		if (depth <= 0 || children.size() == 0) {
 			node.state.getUtility();
 		}
 		if (maximizingPlayer) {

@@ -73,15 +73,17 @@ public class GameState {
 	
 	
 	class UnitState {
-		private int xPosition, yPosition, unitHP, ID;
+		private int xPosition, yPosition, unitHP, ID, basicAtt, range;
 		private boolean isDead;
 		private String type;
-		public UnitState(int x, int y, int hp, int id, boolean dead, String type) {
+		public UnitState(int x, int y, int hp, int id, boolean dead, int basicAttack, int range, String type) {
 			this.xPosition = x;
 			this.yPosition = y;
 			this.unitHP = hp;
 			this.ID = id;
-			this.isDead = dead; 
+			this.isDead = dead;
+			this.basicAtt = basicAttack;
+			this.range = range;
 			this.type = type;
 		}
 	}
@@ -91,6 +93,7 @@ public class GameState {
 	private HashSet<MapLocation> resourceLocations = new HashSet<MapLocation>();
 	private int mapXExtent;
 	private int mapYExtent;
+	//units[0] and units[1] are footmen; units[2] and units [3] are archers
 	private UnitState[] units = new UnitState[4];
 	private int numArchers; //We always have 2 footmen, only the number of archers will change, so store it 
 
@@ -128,13 +131,15 @@ public class GameState {
 		for (Integer unitID : friendlyUnitIDs) {
 			units[index++] = new UnitState(state.getUnit(unitID).getXPosition(), state.getUnit(unitID).getYPosition(),
 					state.getUnit(unitID).getHP(), state.getUnit(unitID).getID(), state.getUnit(unitID).getHP() <= 0,
-					"footman");
+					state.getUnit(unitID).getTemplateView().getBasicAttack(), 
+					state.getUnit(unitID).getTemplateView().getRange(), "footman");
 		}
 		// Fill the units array with UnitState objects that tracks the stats of each unit (footmen)
 		for (Integer unitID : enemyUnitIDs) {
 			units[index++] = new UnitState(state.getUnit(unitID).getXPosition(), state.getUnit(unitID).getYPosition(),
-					state.getUnit(unitID).getHP(), state.getUnit(unitID).getID(), state.getUnit(unitID).getHP() <= 0,
-					"archers");
+					state.getUnit(unitID).getHP(), state.getUnit(unitID).getID(), state.getUnit(unitID).getHP() <= 0, 
+					state.getUnit(unitID).getTemplateView().getBasicAttack(), 
+					state.getUnit(unitID).getTemplateView().getRange(), "archers");
 		}
 
 		// Get the resource IDs
@@ -191,7 +196,7 @@ public class GameState {
 	 */
 	public double getUtility() {
 		int tempMin = Integer.MAX_VALUE;
-		int runningCount = 0;
+		int distanceMetric = 0;
 		// Calculate the minimum distance between pairs of archers/footmen, and
 		// take the sum of
 		// those minimum values
@@ -200,7 +205,7 @@ public class GameState {
 				tempMin = tempMin > getDistance(units[i], units[j]) ? getDistance(
 						units[i], units[j]) : tempMin;
 			}
-			runningCount += tempMin;
+			distanceMetric += tempMin;
 		}
 		
 		//10 * (-dist) + (footmenHP - archerHP)
@@ -208,7 +213,15 @@ public class GameState {
 		// Return the utility of the state as the inverse of the sum of mins;
 		// ie: when archers and footmen
 		// are far apart, the utility is low, and vice versa
-		return (double) 1.0 / runningCount;
+		int hpMetric = 0;
+		for (int j = 0; j < 2 + numArchers; j++) {
+			if (units[j].type.equals("footmen")) {
+				hpMetric += units[j].unitHP;
+			}
+			else
+				hpMetric -= units[j].unitHP;
+		}
+		return hpMetric - distanceMetric;
 	}
 
 	/**
@@ -231,6 +244,7 @@ public class GameState {
 	public List<GameStateChild> getChildren(boolean playerTurn) {
 		List<GameStateChild> childNodes = new ArrayList<GameStateChild>();
 		Map<Integer, Action> unitActions = new HashMap<Integer, Action>();
+		GameState childState = new GameState(this);
 		//If it's the player's turn (our turn), we look at all the possible footmen moves
 		if (playerTurn) {
 			int firstFootmenID = friendlyUnitIDs.get(0);
@@ -254,9 +268,26 @@ public class GameState {
 								&& footmen1Y + dirY >= 0 && footmen1X + dirX >= 0
 								&& footmen1Y + dirY <= mapYExtent
 								&& footmen1X + dirX <= mapXExtent) {
-					//Create the action for footmen1 to move towards direction
-					Action footAct = Action.createCompoundMove(firstFootmenID,
-							footmen1X + dirX, footmen1Y + dirY);
+					Action footAct;
+					//First check if the footmen is next to an archer, if it is, then always attack
+					if (isAdjacent(this.units[0], this.units[2]) || numArchers == 2 && isAdjacent(this.units[0], this.units[3])) {
+						//If adjacent to the first enemy archer
+						if (isAdjacent(this.units[0], this.units[2])) {
+							footAct = Action.createPrimitiveAttack(firstFootmenID, enemyUnitIDs.get(0));
+							//Subtract from the archer's hp the basic attack damage of the footmen
+							childState.units[2].unitHP -= childState.units[0].basicAtt;
+						}
+						//Otherwise adjacent to the second enemy archer; Note, if adjacent to both archers,
+						//then the footman will still attack the first one
+						else 
+							footAct = Action.createPrimitiveAttack(firstFootmenID, enemyUnitIDs.get(1));
+							childState.units[3].unitHP -= childState.units[0].basicAtt;
+					}
+					//If not close enough to attack, then create the action for footmen1 to move towards direction
+					else {
+						footAct = Action.createCompoundMove(firstFootmenID,
+								footmen1X + dirX, footmen1Y + dirY);
+					}
 
 					//An inner loop that will iterate over the moves of the second footmen
 					for (Direction direction2 : Direction.values()) {
@@ -269,13 +300,29 @@ public class GameState {
 										&& footmen2Y + dir2Y >= 0 && footmen2X + dir2X >= 0
 										&& footmen2Y + dir2Y <= mapYExtent
 										&& footmen2X + dir2X <= mapXExtent) {
-							//Create the action for the second footmen to move towards direction2
-							Action footAct2 = Action.createCompoundMove(secondFootmenID,
-									footmen2X + dir2X, footmen2Y + dir2Y);
+							Action footAct2;
+							//First check if the footmen is next to an archer, if it is, then always attack
+							if (isAdjacent(this.units[1], this.units[2]) || numArchers == 2 && isAdjacent(this.units[1], this.units[3])) {
+								//If adjacent to the first enemy archer
+								if (isAdjacent(this.units[1], this.units[2])) {
+									footAct2 = Action.createPrimitiveAttack(secondFootmenID, enemyUnitIDs.get(0));
+									childState.units[2].unitHP -= childState.units[1].basicAtt;
+								}
+								//Otherwise adjacent to the second enemy archer; Note, if adjacent to both archers,
+								//then the footman will still attack the first one
+								else 
+									footAct2 = Action.createPrimitiveAttack(secondFootmenID, enemyUnitIDs.get(1));
+									childState.units[3].unitHP -= childState.units[1].basicAtt;
+							}
+							//If not close enough to attack, then create the action for footmen1 to move towards direction
+							else {
+								footAct2 = Action.createCompoundMove(secondFootmenID,
+										footmen2X + dir2X, footmen2Y + dir2Y);
+							}
 							unitActions.put(firstFootmenID, footAct);
 							unitActions.put(secondFootmenID, footAct2);
 		
-							GameState childState = new GameState(this);
+							
 							//Manually change the positions of the footmen via the UnitState object
 							childState.units[0].xPosition = footmen1X + dirX;
 							childState.units[0].yPosition = footmen1Y + dirY;
@@ -309,9 +356,25 @@ public class GameState {
 								&& archer1Y + dirY >= 0 && archer1X + dirX >= 0
 								&& archer1Y + dirY <= mapYExtent
 								&& archer1X + dirX <= mapXExtent) {
+					Action archerAct;
+					if (isAdjacent(this.units[0], this.units[2]) || isAdjacent(this.units[1], this.units[2])) {
+						//If adjacent to the first enemy archer
+						if (isAdjacent(this.units[0], this.units[2])) {
+							archerAct = Action.createPrimitiveAttack(firstArcherID, friendlyUnitIDs.get(0));
+							childState.units[0].unitHP -= childState.units[2].basicAtt;
+						}
+						//Otherwise adjacent to the second enemy archer; Note, if adjacent to both archers,
+						//then the footman will still attack the first one
+						else 
+							archerAct = Action.createPrimitiveAttack(firstArcherID, friendlyUnitIDs.get(1));
+							childState.units[1].unitHP -= childState.units[3].basicAtt;
+					}
 					//Create the action for footmen1 to move towards direction
-					Action footAct = Action.createCompoundMove(firstArcherID,
-							archer1X + dirX, archer1Y + dirY);
+					else {
+						archerAct = Action.createCompoundMove(firstArcherID,
+								archer1X + dirX, archer1Y + dirY);
+					}
+							
 
 					//An inner loop that will iterate over the moves of the second archer (if it exists)
 					if (numArchers > 1) {
@@ -328,13 +391,25 @@ public class GameState {
 											&& archer2Y + dir2Y >= 0 && archer2X + dir2X >= 0
 											&& archer2Y + dir2Y <= mapYExtent
 											&& archer2X + dir2X <= mapXExtent) {
-								//Create the action for the second footmen to move towards direction2
-								Action footAct2 = Action.createCompoundMove(secondArcherID,
-										archer2X + dir2X, archer2Y + dir2Y);
-								unitActions.put(firstArcherID, footAct);
-								unitActions.put(secondArcherID, footAct2);
+								Action archerAct2;
+								if (isAdjacent(this.units[0], this.units[3]) || isAdjacent(this.units[1], this.units[3])) {
+									//If adjacent to the first enemy archer
+									if (isAdjacent(this.units[0], this.units[3])) {
+										archerAct2 = Action.createPrimitiveAttack(secondArcherID, friendlyUnitIDs.get(0));
+									}
+									//Otherwise adjacent to the second enemy archer; Note, if adjacent to both archers,
+									//then the footman will still attack the first one
+									else 
+										archerAct2 = Action.createPrimitiveAttack(secondArcherID, friendlyUnitIDs.get(1));
+								}
+								//Create the action for footmen1 to move towards direction
+								else {
+									archerAct2 = Action.createCompoundMove(firstArcherID,
+											archer1X + dirX, archer1Y + dirY);
+								}
+								unitActions.put(firstArcherID, archerAct);
+								unitActions.put(secondArcherID, archerAct2);
 
-								GameState childState = new GameState(this);
 								//Manually change the positions of the footmen via the UnitState object
 								childState.units[0].xPosition = archer1X + dirX;
 								childState.units[0].yPosition = archer1Y + dirY;
@@ -360,5 +435,9 @@ public class GameState {
 				+ (unit2.yPosition - unit1.yPosition) ^ 2)
 				^ (1 / 2);
 		return distance;
+	}
+	
+	public boolean isAdjacent(UnitState unit1, UnitState unit2) {
+		return (Math.abs(unit1.xPosition - unit2.xPosition) == 1 || Math.abs(unit1.yPosition - unit2.yPosition) == 1);
 	}
 }
