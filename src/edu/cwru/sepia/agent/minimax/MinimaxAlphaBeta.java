@@ -108,7 +108,7 @@ public class MinimaxAlphaBeta extends Agent {
 		children = node.state.getChildren(maximizingPlayer);
 		children = orderChildrenWithHeuristics(children, maximizingPlayer);
 		if (depth <= 0 || children.size() == 0) {
-			node.state.getUtility();
+			return node.state.getUtility();
 		}
 		if (maximizingPlayer) {
 			v = -infinity;
