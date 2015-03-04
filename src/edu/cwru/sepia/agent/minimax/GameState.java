@@ -509,6 +509,10 @@ public class GameState {
 							
 					childState.units[archerIndex].xPosition = archer1X + dirX;
 					childState.units[archerIndex].yPosition = archer1Y + dirY;
+					if (enemyUnitIDs.size() < 2) {
+						unitActions.put(firstArcherID, archerAct);
+						childNodes.add(new GameStateChild(unitActions, childState));
+					}
 					//An inner loop that will iterate over the moves of the second archer (if it exists)
 					if (numArchers > 1) {
 						int secondArcherID = enemyUnitIDs.get(1);
