@@ -469,7 +469,7 @@ public class AstarAgent extends Agent {
         			Iterator<MapLocation> pathIter = foundPath.iterator();
                 	while (pathIter.hasNext()) {
                 		MapLocation location = pathIter.next();
-            			System.out.println("(" + location.x + ", " + location.y + ")");
+            			//System.out.println("(" + location.x + ", " + location.y + ")");
             	    }
                 	return foundPath;
         		}
