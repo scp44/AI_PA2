@@ -167,14 +167,14 @@ public class GameState {
 	public GameState(GameState newState) {
 		//Initializes the new GameState object with the same fields as the one passed in
 		//Basically making a copy of a GameState object
-		this.friendlyUnitIDs = newState.friendlyUnitIDs;
-		this.enemyUnitIDs = newState.enemyUnitIDs;
+		friendlyUnitIDs = newState.friendlyUnitIDs;
+		enemyUnitIDs = newState.enemyUnitIDs;
 
-		this.resourceLocations = newState.resourceLocations;
-		this.mapXExtent = newState.mapXExtent;
-		this.mapYExtent = newState.mapYExtent;
-		this.units = newState.units;
-		this.numArchers = newState.numArchers;
+		resourceLocations = newState.resourceLocations;
+		mapXExtent = newState.mapXExtent;
+		mapYExtent = newState.mapYExtent;
+		units = newState.units;
+		numArchers = newState.numArchers;
 	}
 
 	/**
@@ -353,7 +353,6 @@ public class GameState {
 					}
 					//An inner loop that will iterate over the moves of the second footmen
 					for (Direction direction2 : Direction.values()) {
-						
 						//If the one of the two footmen is dead, break out of this loop
 						if (friendlyUnitIDs.size() < 2) {
 							break;
@@ -401,8 +400,9 @@ public class GameState {
 							//Manually change the positions of the footmen via the UnitState object
 							childState.units[1].xPosition = footmen2X + dir2X;
 							childState.units[1].yPosition = footmen2Y + dir2Y;
-							GameState tempState = new GameState(childState);
-							childNodes.add(new GameStateChild(unitActions, new GameState(childState)));
+							//GameState tempState = new GameState(childState);
+							childNodes.add(new GameStateChild(unitActions, childState));
+							
 						}
 					}
 				}
@@ -505,8 +505,6 @@ public class GameState {
 							}
 						}
 					}
-					
-					
 				}
 			}
 			return childNodes;
