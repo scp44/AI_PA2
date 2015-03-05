@@ -147,7 +147,7 @@ public class AstarAgent extends Agent {
     {
         super(playernum);
 
-        System.out.println("Constructed AstarAgent");
+        //System.out.println("Constructed AstarAgent");
     }
 
     @Override
@@ -391,8 +391,8 @@ public class AstarAgent extends Agent {
     public double getHopDistance(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation otherFootmanLoc, HashSet<MapLocation> resourceLocations){
     	
     	Stack<MapLocation> foundPath = AstarSearch(start, goal, xExtent, yExtent, otherFootmanLoc, resourceLocations);
-    	System.out.println("Footman Location: (" + start.x + ", " + start.y + "\nDistance to goal: " + foundPath.size() + " and: " + 
-    			foundPath.get(0).x + ", " + foundPath.get(0).y);
+    	/*System.out.println("Footman Location: (" + start.x + ", " + start.y + "\nDistance to goal: " + foundPath.size() + " and: " + 
+    			foundPath.get(0).x + ", " + foundPath.get(0).y);*/
     	return (double)foundPath.size();
     }
     
@@ -471,14 +471,17 @@ public class AstarAgent extends Agent {
         		if (current.equals(goal))
         		{
         			//reconstruct path & return it
-        			System.out.println("Goal found.\n");
-        			
+        			//System.out.println("Goal found.\n");
+        			if(current.equals(start)) {
+        				//System.out.println();
+        			}
+        			System.out.println("Goal: " + goal.x + ", " + goal.y);
         			Stack<MapLocation> foundPath = reconstructPath(current, start);
         			Iterator<MapLocation> pathIter = foundPath.iterator();
-                	while (pathIter.hasNext()) {
+                	/*while (pathIter.hasNext()) {
                 		MapLocation location = pathIter.next();
             			//System.out.println("(" + location.x + ", " + location.y + ")");
-            	    }
+            	    }*/
                 	return foundPath;
         		}
         		
@@ -528,7 +531,11 @@ public class AstarAgent extends Agent {
     {
     	Stack<MapLocation> path = new Stack<MapLocation>();
     	path.add(current);
-    	System.out.println(current.cameFrom);
+    	//System.out.println(current.cameFrom);
+    	if (current.cameFrom == null) {
+    		return path;
+    	}
+
     	while(!(current.cameFrom.equals(start)))
     	{
     		current = current.cameFrom;
