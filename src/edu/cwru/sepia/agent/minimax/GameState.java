@@ -32,7 +32,7 @@ public class GameState {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + getOuterType().hashCode();
+			result = prime * result + 15;
 			result = prime * result + x;
 			result = prime * result + y;
 			return result;
@@ -50,9 +50,9 @@ public class GameState {
 				return false;
 			}
 			MapLocation other = (MapLocation) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
+			/*if (!getOuterType().equals(other.getOuterType())) {
 				return false;
-			}
+			}*/
 			if (x != other.x) {
 				return false;
 			}
@@ -176,7 +176,6 @@ public class GameState {
 			AstarResourceLocations.add(searchAgent.new MapLocation(resource.getXPosition(),
 					resource.getYPosition(), null, 0));
 		}
-		System.out.println("Astarresources: " + AstarResourceLocations.size());
 		// Get the boundaries (size) of the entire map s
 		mapXExtent = state.getXExtent();
 		mapYExtent = state.getYExtent();
