@@ -529,7 +529,7 @@ public class AstarAgent extends Agent {
     private Stack<MapLocation> reconstructPath(MapLocation current, MapLocation start)
     {
     	Stack<MapLocation> path = new Stack<MapLocation>();
-    	path.add(current);
+    	//path.add(current);
     	//System.out.println(current.cameFrom);
     	if (current.cameFrom == null) {
     		return path;
