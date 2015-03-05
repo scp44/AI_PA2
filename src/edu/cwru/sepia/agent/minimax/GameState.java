@@ -222,7 +222,7 @@ public class GameState {
 	 * @return The weighted linear combination of the features
 	 */
 	public double getUtility() {
-		double tempMin = (double)Integer.MAX_VALUE;
+
 		int distanceMetric = 0;
 
 		int numFootmen;
@@ -232,9 +232,10 @@ public class GameState {
 		else
 			numFootmen = 2;
 		for (int i = 0; i < numFootmen; i++) {
+			double tempMin = (double)Integer.MAX_VALUE;
 			for (int j = numFootmen; j < numFootmen + numArchers; j++) {
 				
-				tempMin = (double)Integer.MAX_VALUE;
+				//tempMin = (double)Integer.MAX_VALUE;
 				/*int otherArcherPos;
 				if(j < numFootmen + numArchers - 1)
 					otherArcherPos = j+1;
