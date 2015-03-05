@@ -236,6 +236,7 @@ public class GameState {
 		for (int i = 0; i < numFootmen; i++) {
 			for (int j = numFootmen; j < numFootmen + numArchers; j++) {
 				int otherArcherPos;
+				tempMin = (double)Integer.MAX_VALUE;
 				if(j < numFootmen + numArchers - 1)
 					otherArcherPos = j+1;
 				else
@@ -255,7 +256,7 @@ public class GameState {
 						? searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
 								otherArcherLoc, AstarResourceLocations) : tempMin;
 			}
-			//System.out.println("Temp min is: " + tempMin);
+			
 			distanceMetric += tempMin;
 		}
 		
@@ -273,7 +274,7 @@ public class GameState {
 				hpMetric -= units[j].unitHP;
 		}
 
-		return hpMetric - 1.65 * distanceMetric;
+		return  hpMetric - 1.67 * distanceMetric;
 
 	}
 
@@ -375,7 +376,7 @@ public class GameState {
 						/*System.out.println("Footmen1's position: (" + this.units[0].xPosition + ", " + this.units[0].yPosition
 								+ "), Archer1's position: (" + this.units[archerIndex].xPosition + ", " + this.units[archerIndex].yPosition + ")");
 						System.out.println("footman1 is adjacent to an archer!");*/
-						System.out.println("First footman is adjacent to an archer!");
+						//System.out.println("First footman is adjacent to an archer!");
 						//If adjacent to the first enemy archer
 						if (isAdjacent(this.units[0], this.units[archerIndex])) {
 							
@@ -427,7 +428,7 @@ public class GameState {
 								/*System.out.println("Footmen2's position: (" + this.units[1].xPosition + ", " + this.units[1].yPosition
 										+ "), Archer2's position: (" + this.units[3].xPosition + ", " + this.units[3].yPosition + ")");*/
 								//If adjacent to the first enemy archer
-								System.out.println("footman2 is adjacent to an archer!");
+								//System.out.println("footman2 is adjacent to an archer!");
 								if (isAdjacent(this.units[1], this.units[2])) {
 
 									footAct2 = Action.createPrimitiveAttack(secondFootmenID, enemyUnitIDs.get(0));
