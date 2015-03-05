@@ -272,7 +272,9 @@ public class GameState {
 			else
 				hpMetric -= units[j].unitHP;
 		}
+
 		return hpMetric - 1.65 * distanceMetric;
+
 	}
 
 	/**
@@ -352,6 +354,11 @@ public class GameState {
 								&& footmen1Y + dirY <= mapYExtent
 								&& footmen1X + dirX <= mapXExtent) {
 					Action footAct;
+					
+					int temp1 = (footmen1X + dirX);
+					int temp2 = (footmen1Y + dirY);
+					
+					//System.out.println("(" + temp1 + "," + temp2 + ")");
 					//First check if the footmen is next to an archer, if it is, then always attack
 					//System.out.println(this.units[2] + " :::::::: " + this.units[3]);
 					//System.out.println("0: " + this.units[0].type + "  1: " + this.units[1].type + 
