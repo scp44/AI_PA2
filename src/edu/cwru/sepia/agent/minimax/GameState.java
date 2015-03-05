@@ -191,7 +191,7 @@ public class GameState {
 		enemyUnitIDs.addAll(0, newState.enemyUnitIDs); 
 		
 		resourceLocations = new HashSet<MapLocation>(newState.resourceLocations);
-		AstarResourceLocations = new HashSet<AstarAgent.MapLocation>(newState.AstarResourceLocations);
+		AstarResourceLocations = (newState.AstarResourceLocations);
 		mapXExtent = newState.mapXExtent;
 		mapYExtent = newState.mapYExtent;
 		int j = 0;
@@ -255,7 +255,7 @@ public class GameState {
 						? searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
 								otherArcherLoc, AstarResourceLocations) : tempMin;
 			}
-			System.out.println("Temp min is: " + tempMin);
+			//System.out.println("Temp min is: " + tempMin);
 			distanceMetric += tempMin;
 		}
 		
