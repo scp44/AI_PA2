@@ -39,9 +39,9 @@ public class AstarAgent extends Agent {
 				return false;
 			}
 			MapLocation other = (MapLocation) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
+			/*if (!getOuterType().equals(other.getOuterType())) {
 				return false;
-			}
+			}*/
 			if (x != other.x) {
 				return false;
 			}
@@ -55,7 +55,7 @@ public class AstarAgent extends Agent {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + getOuterType().hashCode();
+			result = prime * result + 15;
 			result = prime * result + x;
 			result = prime * result + y;
 			return result;
@@ -391,7 +391,8 @@ public class AstarAgent extends Agent {
     public double getHopDistance(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation otherFootmanLoc, HashSet<MapLocation> resourceLocations){
     	
     	Stack<MapLocation> foundPath = AstarSearch(start, goal, xExtent, yExtent, otherFootmanLoc, resourceLocations);
-    	System.out.println("Footman Location: (" + start.x + ", " + start.y + "\nDistance to goal: " + foundPath.size());
+    	System.out.println("Footman Location: (" + start.x + ", " + start.y + "\nDistance to goal: " + foundPath.size() + " and: " + 
+    			foundPath.get(0).x + ", " + foundPath.get(0).y);
     	return (double)foundPath.size();
     }
     
@@ -443,6 +444,7 @@ public class AstarAgent extends Agent {
     private Stack<MapLocation> AstarSearch(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation enemyFootmanLoc, HashSet<MapLocation> resourceLocations)
     {
     	{
+
     		PriorityQueueList openList = new PriorityQueueList(1);
         	Set<MapLocation> closedList = new HashSet<MapLocation>();
         	
@@ -547,6 +549,8 @@ public class AstarAgent extends Agent {
     {
     	MapLocation[] neighbors = new MapLocation[4];
     	int index = 0;
+    	
+
 		if(current.x - 1 >= 0 && current.y >= 0 && !resourceLocations.contains( 
 				new MapLocation(current.x - 1, current.y, null, 0)) && !(enemyFootmanLoc.x == current.x - 1
     			&& enemyFootmanLoc.y == current.y)) {
