@@ -474,7 +474,7 @@ public class AstarAgent extends Agent {
         			if(current.equals(start)) {
         				//System.out.println();
         			}
-        			System.out.println("Goal: " + goal.x + ", " + goal.y);
+        			//System.out.println("Goal: " + goal.x + ", " + goal.y);
         			Stack<MapLocation> foundPath = reconstructPath(current, start);
         			Iterator<MapLocation> pathIter = foundPath.iterator();
                 	/*while (pathIter.hasNext()) {
