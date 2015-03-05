@@ -391,8 +391,8 @@ public class AstarAgent extends Agent {
     public double getHopDistance(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation otherFootmanLoc, HashSet<MapLocation> resourceLocations){
     	
     	Stack<MapLocation> foundPath = AstarSearch(start, goal, xExtent, yExtent, otherFootmanLoc, resourceLocations);
-    	System.out.println("Footman Location: (" + start.x + ", " + start.y + "\nDistance to goal: " + foundPath.size() + " and: " + 
-    			foundPath.get(0).x + ", " + foundPath.get(0).y);
+    	//System.out.println("Footman Location: (" + start.x + ", " + start.y + ")" + "\nDistance to goal: " + foundPath.size() + " and: " + 
+    			//foundPath.get(0).x + ", " + foundPath.get(0).y);
     	return (double)foundPath.size();
     }
     
