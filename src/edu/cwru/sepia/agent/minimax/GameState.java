@@ -244,8 +244,9 @@ public class GameState {
 				AstarAgent.MapLocation footmanLoc = searchAgent.new MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
 				AstarAgent.MapLocation archerLoc = searchAgent.new MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
 				AstarAgent.MapLocation otherArcherLoc;
-				if(units[otherArcherPos] == null)
+				if (numArchers < 2) {
 					otherArcherLoc = null;
+				}
 				else
 					otherArcherLoc = searchAgent.new MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
 				
@@ -271,7 +272,7 @@ public class GameState {
 			else
 				hpMetric -= units[j].unitHP;
 		}
-		return hpMetric - distanceMetric;
+		return hpMetric - 1.65 * distanceMetric;
 	}
 
 	/**
@@ -293,11 +294,9 @@ public class GameState {
 	 */
 	public List<GameStateChild> getChildren(boolean playerTurn) {
 		//First check if all archers or all footmen are dead
-		if (((units[3] == null || units[0].unitHP <= 0)
-				&& (units[1] == null || units[1].unitHP <= 0))
-				|| ((units[2] == null || units[2].unitHP <= 0)
-						&& (units[3] == null || units[3].unitHP <= 0))) {
-			
+		if (friendlyUnitIDs.size() < 1 || enemyUnitIDs.size() < 1) {
+			System.out.println("GAME OVER!!");
+			return null;
 		}
 		
 		
@@ -366,9 +365,10 @@ public class GameState {
 					else
 						archerIndex = 2;
 					if (isAdjacent(this.units[0], this.units[archerIndex]) || (numArchers == 2 && isAdjacent(this.units[0], this.units[archerIndex + 1]))) {
-						System.out.println("Footmen1's position: (" + this.units[0].xPosition + ", " + this.units[0].yPosition
+						/*System.out.println("Footmen1's position: (" + this.units[0].xPosition + ", " + this.units[0].yPosition
 								+ "), Archer1's position: (" + this.units[archerIndex].xPosition + ", " + this.units[archerIndex].yPosition + ")");
-						System.out.println("footman1 is adjacent to an archer!");
+						System.out.println("footman1 is adjacent to an archer!");*/
+						System.out.println("First footman is adjacent to an archer!");
 						//If adjacent to the first enemy archer
 						if (isAdjacent(this.units[0], this.units[archerIndex])) {
 							
