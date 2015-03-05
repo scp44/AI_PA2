@@ -224,9 +224,7 @@ public class GameState {
 	public double getUtility() {
 		double tempMin = (double)Integer.MAX_VALUE;
 		int distanceMetric = 0;
-		// Calculate the minimum distance between pairs of archers/footmen, and
-		// take the sum of
-		// those minimum values
+
 		int numFootmen;
 		if (friendlyUnitIDs.size() < 2) {
 			numFootmen = 1;
@@ -235,26 +233,33 @@ public class GameState {
 			numFootmen = 2;
 		for (int i = 0; i < numFootmen; i++) {
 			for (int j = numFootmen; j < numFootmen + numArchers; j++) {
-				int otherArcherPos;
+				
 				tempMin = (double)Integer.MAX_VALUE;
+				/*int otherArcherPos;
 				if(j < numFootmen + numArchers - 1)
 					otherArcherPos = j+1;
 				else
-					otherArcherPos = j-1;
+					otherArcherPos = j-1;*/
 				
 				AstarAgent.MapLocation footmanLoc = searchAgent.new MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
 				AstarAgent.MapLocation archerLoc = searchAgent.new MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
 				AstarAgent.MapLocation otherArcherLoc;
-				if (numArchers < 2) {
+				/*if (numArchers < 2) {
 					otherArcherLoc = null;
 				}
 				else
 					otherArcherLoc = searchAgent.new MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
+					*/
+				if (numFootmen < 2) {
+					otherArcherLoc = null;
+				}
+				else 
+					otherArcherLoc = searchAgent.new MapLocation(units[1 - i].xPosition, units[1 - i].yPosition, null, 0);
 				
-				tempMin = tempMin > searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
-																otherArcherLoc, AstarResourceLocations)
-						? searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
-								otherArcherLoc, AstarResourceLocations) : tempMin;
+				double hops = searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
+						otherArcherLoc, AstarResourceLocations);
+				tempMin = tempMin > hops
+						? hops : tempMin;
 			}
 			
 			distanceMetric += tempMin;
@@ -274,7 +279,7 @@ public class GameState {
 				hpMetric -= units[j].unitHP;
 		}
 
-		return  hpMetric - 1.67 * distanceMetric;
+		return  -1.67 * distanceMetric;
 
 	}
 
