@@ -24,8 +24,7 @@ public class MinimaxAlphaBeta extends Agent {
 			System.exit(1);
 		}
 
-		//numPlys = Integer.parseInt(args[0]);
-		numPlys = 4;
+		numPlys = Integer.parseInt(args[0]);
 		System.out.println("Number of plys is: " + numPlys);
 	}
 
@@ -81,6 +80,9 @@ public class MinimaxAlphaBeta extends Agent {
 	 *            The current best value for the minimizing node from this node
 	 *            to the root
 	 * @return The best child of this node with updated values
+	 * 
+	 * gets a sorting utility to order the children, then uses minimax to get the actual
+	 * 	utility of the children.
 	 */
 	public GameStateChild alphaBetaSearch(GameStateChild node, int depth,
 			double alpha, double beta) {
@@ -101,6 +103,7 @@ public class MinimaxAlphaBeta extends Agent {
 		return node;
 	}
 
+	//recursively goes through child states and returns utility as a double up the chain
 	public double minimax(GameStateChild node, int depth, double alpha,
 			double beta, boolean maximizingPlayer) {
 		if (depth <= 0) {
@@ -151,6 +154,8 @@ public class MinimaxAlphaBeta extends Agent {
 	 *
 	 * @param children
 	 * @return The list of children sorted by your heuristic.
+	 * 
+	 * orders children according to the utility using insertion sort
 	 */
 	public List<GameStateChild> orderChildrenWithHeuristics(
 			List<GameStateChild> children, boolean maximizingPlayer) {
