@@ -389,6 +389,12 @@ public class AstarAgent extends Agent {
     
     //calls AstarSearch, returns smallest number of "hops" from one location to another
     public double getHopDistance(MapLocation start, MapLocation goal, int xExtent, int yExtent, MapLocation otherFootmanLoc, HashSet<MapLocation> resourceLocations){
+    	if (start.x == goal.x && start.y == goal.y) {
+    		return 0;
+    	}
+    	if (otherFootmanLoc != null && goal.x == otherFootmanLoc.x && goal.y == otherFootmanLoc.y) {
+    		return (double)Integer.MAX_VALUE;
+    	}
     	
     	Stack<MapLocation> foundPath = AstarSearch(start, goal, xExtent, yExtent, otherFootmanLoc, resourceLocations);
 
@@ -523,7 +529,9 @@ public class AstarAgent extends Agent {
         }
     	
     	//no path. Return empty path
+    	System.out.println("No path found using Astar!!");
         return new Stack<MapLocation>();
+        
     }
 
     private Stack<MapLocation> reconstructPath(MapLocation current, MapLocation start)
