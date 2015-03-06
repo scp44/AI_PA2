@@ -244,7 +244,7 @@ public class GameState {
 				
 				AstarAgent.MapLocation footmanLoc = searchAgent.new MapLocation(units[i].xPosition, units[i].yPosition, null, 0);
 				AstarAgent.MapLocation archerLoc = searchAgent.new MapLocation(units[j].xPosition, units[j].yPosition, null, 0);
-				AstarAgent.MapLocation otherArcherLoc;
+				AstarAgent.MapLocation otherFootmanLoc;
 				/*if (numArchers < 2) {
 					otherArcherLoc = null;
 				}
@@ -252,15 +252,15 @@ public class GameState {
 					otherArcherLoc = searchAgent.new MapLocation(units[otherArcherPos].xPosition, units[otherArcherPos].yPosition, null, 0);
 					*/
 				if (numFootmen < 2) {
-					otherArcherLoc = null;
+					otherFootmanLoc = null;
 				}
 				else {
-					otherArcherLoc = searchAgent.new MapLocation(units[1 - i].xPosition, units[1 - i].yPosition, null, 0);
+					otherFootmanLoc = searchAgent.new MapLocation(units[1 - i].xPosition, units[1 - i].yPosition, null, 0);
 					//System.out.println(otherArcherLoc.x + ", " + otherArcherLoc.y);
 				}
 				
 				double hops = searchAgent.getHopDistance(footmanLoc, archerLoc, mapXExtent, mapYExtent,
-						otherArcherLoc, AstarResourceLocations);
+						otherFootmanLoc, AstarResourceLocations);
 				tempMin = tempMin > hops
 						? hops : tempMin;
 			}

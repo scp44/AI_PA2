@@ -25,7 +25,7 @@ public class MinimaxAlphaBeta extends Agent {
 		}
 
 		//numPlys = Integer.parseInt(args[0]);
-		numPlys = 1;
+		numPlys = 4;
 		System.out.println("Number of plys is: " + numPlys);
 	}
 
@@ -164,11 +164,11 @@ public class MinimaxAlphaBeta extends Agent {
 	public List<GameStateChild> insertionSort(List<GameStateChild> list,
 			boolean maxPlayer) {
 		GameStateChild temp;
-		if (maxPlayer) {
+		if (maxPlayer) { //order max to min
 			for (int i = 1; i < list.size(); i++) {
 				temp = list.get(i);
 				int j;
-				for (j = i - 1; j >= 0 && temp.state.getUtility() < list.get(j).state.getUtility(); j--) {
+				for (j = i - 1; j >= 0 && temp.state.getUtility() > list.get(j).state.getUtility(); j--) {
 					list.add(j + 1, list.get(j));
 					list.remove(j + 2);
 				}
@@ -176,11 +176,11 @@ public class MinimaxAlphaBeta extends Agent {
 				list.remove(j + 2);
 			}
 		}
-		else {
+		else { //order min to max
 			for (int i = 1; i < list.size(); i++) {
 				temp = list.get(i);
 				int j;
-				for (j = i - 1; j >= 0 && temp.state.getUtility() > list.get(j).state.getUtility(); j--) {
+				for (j = i - 1; j >= 0 && temp.state.getUtility() < list.get(j).state.getUtility(); j--) {
 					list.add(j + 1, list.get(j));
 					list.remove(j + 2);
 				}
