@@ -249,7 +249,7 @@ public class AstarAgent extends Agent {
 
         if(!path.empty() && (nextLoc == null || (footmanX == nextLoc.x && footmanY == nextLoc.y))) {
 
-            // stat moving to the next step in the path
+            // start moving to the next step in the path
             nextLoc = path.pop();
 
             System.out.println("Moving to (" + nextLoc.x + ", " + nextLoc.y + ")");
@@ -345,11 +345,6 @@ public class AstarAgent extends Agent {
 			}
 	    }
     	return false;
-    	
-    	//if((enemy is on our path) && (enemy is within 3 steps of us))
-    		//recalculate = true;
-    	//return true;
-
     }
 
     /**
@@ -476,17 +471,8 @@ public class AstarAgent extends Agent {
         		if (current.equals(goal))
         		{
         			//reconstruct path & return it
-        			//System.out.println("Goal found.\n");
-        			if(current.equals(start)) {
-        				//System.out.println();
-        			}
-        			//System.out.println("Goal: " + goal.x + ", " + goal.y);
         			Stack<MapLocation> foundPath = reconstructPath(current, start);
-        			Iterator<MapLocation> pathIter = foundPath.iterator();
-                	/*while (pathIter.hasNext()) {
-                		MapLocation location = pathIter.next();
-            			//System.out.println("(" + location.x + ", " + location.y + ")");
-            	    }*/
+
                 	return foundPath;
         		}
         		
@@ -529,7 +515,7 @@ public class AstarAgent extends Agent {
         }
     	
     	//no path. Return empty path
-    	System.out.println("No path found using Astar!!");
+    	System.out.println("No path found using Astar!");
         return new Stack<MapLocation>();
         
     }
@@ -537,8 +523,7 @@ public class AstarAgent extends Agent {
     private Stack<MapLocation> reconstructPath(MapLocation current, MapLocation start)
     {
     	Stack<MapLocation> path = new Stack<MapLocation>();
-    	//path.add(current);
-    	//System.out.println(current.cameFrom);
+
     	if (current.cameFrom == null) {
     		return path;
     	}
@@ -563,7 +548,6 @@ public class AstarAgent extends Agent {
     {
     	MapLocation[] neighbors = new MapLocation[4];
     	int index = 0;
-    	
 
 		if(current.x - 1 >= 0 && current.y >= 0 && !resourceLocations.contains( 
 				new MapLocation(current.x - 1, current.y, null, 0)) && !(enemyFootmanLoc.x == current.x - 1
