@@ -103,11 +103,14 @@ public class MinimaxAlphaBeta extends Agent {
 
 	public double minimax(GameStateChild node, int depth, double alpha,
 			double beta, boolean maximizingPlayer) {
+		if (depth <= 0) {
+			return node.state.getUtility();
+		}
 		double v = 0;
 		List<GameStateChild> children = new ArrayList<GameStateChild>();
 		children = node.state.getChildren(maximizingPlayer);
 		children = orderChildrenWithHeuristics(children, maximizingPlayer);
-		if (depth <= 0 || children.size() == 0) {
+		if (children.size() == 0) {
 			return node.state.getUtility();
 		}
 		if (maximizingPlayer) {
@@ -185,6 +188,12 @@ public class MinimaxAlphaBeta extends Agent {
 				list.remove(j + 2);
 			}
 		}
+
+		/*System.out.println("Sorted utility: " + list.get(0).state.getUtility());
+		System.out.println("And the footmen1 positions are: " + list.get(0).state.units[0].xPosition + ", "
+				+ list.get(0).state.units[0].yPosition + "\n and footmen2 positions are: " + list.get(1).state.units[1].xPosition + ", "
+				+ list.get(1).state.units[1].yPosition);*/
+		System.out.println();
 		return list;
 	}
 }
