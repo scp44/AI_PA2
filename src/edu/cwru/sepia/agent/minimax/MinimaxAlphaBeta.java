@@ -24,9 +24,7 @@ public class MinimaxAlphaBeta extends Agent {
 			System.exit(1);
 		}
 
-		//numPlys = Integer.parseInt(args[0]);
-		numPlys = 4;
-		System.out.println("Number of plys is: " + numPlys);
+		numPlys = Integer.parseInt(args[0]);
 	}
 
 	@Override
